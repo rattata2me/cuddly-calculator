@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include "common.h"
+#include "graphics/pixelbuffer.h"
 
 // Constant screen size
 const int SCREEN_WIDTH = 640;
@@ -11,8 +11,10 @@ const  char * WINDOW_NAME = "Simulation?";
 
 //  Global
 bool running = false;
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
+SDL_Window * window = NULL;
+SDL_Renderer * renderer = NULL;
+
+G_PixelBuffer * buffer;
 
 
 // Test values, just for fun, TODO: create a drawing library.
@@ -42,6 +44,9 @@ int init(){
 		printf("Is this a computer or a toaster, mmm, ERROR: %s\n", SDL_GetError());	
 		return 1;
 	}
+
+	g_create_buffer(buffer, 128, 64);
+
 	return 0;
 
 }
