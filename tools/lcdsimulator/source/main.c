@@ -41,14 +41,19 @@ int init(){
 
 
 	if(renderer == NULL){
-		printf("Is this a computer or a toaster, mmm, ERROR: %s\n", SDL_GetError());	
+		printf("Is this a computer or a toaster?, mmm, ERROR: %s\n", SDL_GetError());	
 		return 1;
 	}
 
-	g_create_buffer(buffer, 128, 64);
+	buffer = g_create_buffer(128, 64);
+
+	g_set_pixel(buffer, 2, 0, 1);
+
+	g_clear(buffer);
+
+	g_set_pixel(buffer, 4, 0, 1);
 
 	return 0;
-
 }
 
 void clear(int r, int g, int b, int a){
@@ -67,11 +72,16 @@ void render(){
 
 	clear(0x22, 0x22, 0x22, 0xff);
 
-
-	SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
-
 	for(int y = 0; y < esh; y++){
 		for(int x = 0; x < esw; x++){
+			int e = g_get_pixel(buffer, x, y);
+
+			if(e == 0){
+				SDL_SetRenderDrawColor(renderer, 0x00, 0x3F, 0x00, 0xFF);
+			}else{
+				SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
+			}
+
 			SDL_Rect pixelrect = {65+(pixel_size+padding)*x, 20+(pixel_size+padding)*y, pixel_size, pixel_size};
 			SDL_RenderFillRect(renderer, &pixelrect);
 		}
@@ -119,5 +129,4 @@ int main(int argc, char* args[]){
 	quit();
 
 	return 0;
-
 }

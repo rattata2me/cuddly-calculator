@@ -7,20 +7,23 @@ extern const int MEMORY_UNIT;
 
 
 typedef struct{
-	int width;
-	int striplen;
-	int height;
+
+	unsigned int width;
+	unsigned int striplen;
+	unsigned int height;
 	unsigned int * pixels;
 
 } G_PixelBuffer;
 
 
-void g_create_buffer(G_PixelBuffer * buffer, unsigned int width, unsigned int height);
+G_PixelBuffer * g_create_buffer(unsigned int width, unsigned int height);
 
 void g_destroy_buffer(G_PixelBuffer * buffer);
 
-void g_set_pixel(G_PixelBuffer * buffer, int x, int y, char val);
+void g_set_pixel(G_PixelBuffer * buffer, int x, int y, int val);
 
-char g_get_pixel(G_PixelBuffer * buffer, int x, int y);
+int g_get_pixel(G_PixelBuffer * buffer, int x, int y);
+
+void g_clear(G_PixelBuffer * buffer);
 
 #endif

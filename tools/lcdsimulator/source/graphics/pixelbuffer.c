@@ -1,22 +1,23 @@
 #include "graphics/pixelbuffer.h"
 
-const int G_MEMORY_UNIT = sizeof(int);
+const int G_MEMORY_UNIT = sizeof(unsigned int)*8;
 
 
-void g_create_buffer(G_PixelBuffer * buffer, unsigned int width, unsigned int height){
+G_PixelBuffer * g_create_buffer(unsigned int width, unsigned int height){
 
+	G_PixelBuffer * buffer;
 
 	// Divide the pixel array in int groups. One pixel = one bit, so there are sizeof(int) pixels in each group.
 	int nrow = (width+(G_MEMORY_UNIT - (width % G_MEMORY_UNIT)))/G_MEMORY_UNIT;
-	int ncol = height; // It is not necessary to reorder the height
 
 	// Buffer allocation
 	buffer = malloc(sizeof(G_PixelBuffer));
 	buffer->width = width;
 	buffer->striplen = nrow;
 	buffer->height = height;
-	buffer->pixels = (unsigned int *) malloc(nrow*G_MEMORY_UNIT*ncol);
+	buffer->pixels = (unsigned int *) calloc(nrow*height, (G_MEMORY_UNIT/8));
 
+	return buffer;
 }
 
 void g_destroy_buffer(G_PixelBuffer * buffer){
@@ -26,16 +27,60 @@ void g_destroy_buffer(G_PixelBuffer * buffer){
 
 }
 
-void g_set_pixel(G_PixelBuffer * buffer, int x, int y, char val){
+void g_set_pixel(G_PixelBuffer * buffer, int x, int y, int val){
 
-	int xpos = (x - (x%G_MEMORY_UNIT)) / G_MEMORY_UNIT;
-	int gval = *((buffer->pixels)+xpos+y*(buffer->striplen));
-	gval = 0;
+	//Relative x position in the memory block
+	int rest = x%G_MEMORY_UNIT;
+
+	// Memory block position
+	int xpos = (x - rest) / G_MEMORY_UNIT;
+
+	// Memory block pointer
+	unsigned int * gval = (unsigned int *)((buffer->pixels)+xpos+y*(buffer->striplen));
 	
+	if(val == 0){
+		
+		// Bit substraction
+		unsigned int sum = ~(1U << ((G_MEMORY_UNIT-1) - rest));
+		sum = (*gval) & sum;
+		*gval = sum;
+
+	}else{
+	
+		// Bit addition
+		unsigned int sum = 1U << ((G_MEMORY_UNIT-1) - rest);
+		sum = (*gval) | sum;
+		*gval = sum;
+
+	}
 }
 
-char g_get_pixel(G_PixelBuffer * buffer, int x, int y){
+int g_get_pixel(G_PixelBuffer * buffer, int x, int y){
 
-	return 2;
+	//Relative x position in the memory block
+	int rest = x%G_MEMORY_UNIT;
+
+	// Memory block position
+	int xpos = (x - rest) / G_MEMORY_UNIT;
+
+	// Memory block pointer
+	unsigned int * gval = (unsigned int *)((buffer->pixels)+xpos+y*(buffer->striplen));
+
+
+	// Bit comparison
+	unsigned int sum = 1U << ((G_MEMORY_UNIT-1) - rest);
+	sum = sum & (*gval);
+
+	if(sum == 0){
+		return 0;
+	}
+
+	return 1;
+}
+
+
+void g_clear(G_PixelBuffer * buffer){
+
+	memset(buffer->pixels, 0, (G_MEMORY_UNIT/8)*buffer->striplen*buffer->height);
 
 }
