@@ -15,5 +15,7 @@ extern const char* endl;
 
 extern const unsigned int CCALCLCDSIM_VERSION_NUMBER;
 
+int sign(int x);
+
 
 #endif

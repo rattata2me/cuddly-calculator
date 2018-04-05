@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "common.h"
 #include "graphics/pixelbuffer.h"
+#include "graphics/renderer.h"
 
 // Constant screen size
 const int SCREEN_WIDTH = 640;
@@ -52,6 +53,10 @@ int init(){
 	g_clear(buffer);
 
 	g_set_pixel(buffer, 4, 0, 1);
+
+	vec2 x1 = {5, 10}, x2 = {20, 30};
+	g_draw_line(buffer, x1, x2, 1);
+	g_draw_line(buffer, vec2_add(x1, x2), x1, 1);
 
 	return 0;
 }
