@@ -29,6 +29,9 @@ void g_destroy_buffer(G_PixelBuffer * buffer){
 
 void g_set_pixel(G_PixelBuffer * buffer, int x, int y, int val){
 
+	// Box limitation to prevent overflow.
+	if(((x < 0) | (x > buffer->width)) | ((y < 0) | (y > buffer->height))) return;
+
 	//Relative x position in the memory block
 	int rest = x%G_MEMORY_UNIT;
 
@@ -56,6 +59,9 @@ void g_set_pixel(G_PixelBuffer * buffer, int x, int y, int val){
 }
 
 int g_get_pixel(G_PixelBuffer * buffer, int x, int y){
+
+	// Box limitation to prevent overflow.
+	if(((x < 0) | (x > buffer->width)) | ((y < 0) | (y > buffer->height))) return 0;
 
 	//Relative x position in the memory block
 	int rest = x%G_MEMORY_UNIT;

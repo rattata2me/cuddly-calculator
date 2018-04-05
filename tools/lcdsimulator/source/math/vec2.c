@@ -5,6 +5,11 @@ vec2 vec2_create(int x, int y){
 	return result;
 }
 
+vec2 vec2_add(vec2 point, int x, int y){
+	point.x = point.x + x; point.y = point.y + y;
+	return point;
+}
+
 vec2 vec2_sum(vec2 point1, vec2 point2){
 	vec2 result = {(point1.x + point2.x), (point1.y + point2.y)};
 	return result;

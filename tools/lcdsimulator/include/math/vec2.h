@@ -8,6 +8,8 @@ typedef struct{
 	int y;
 } vec2;
 
+vec2 vec2_add(vec2 point, int x, int y);
+
 vec2 vec2_sum(vec2 point1, vec2 point2);
 
 vec2 vec2_minus(vec2 point1, vec2 point2);

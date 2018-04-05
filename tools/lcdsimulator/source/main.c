@@ -48,16 +48,9 @@ int init(){
 
 	buffer = g_create_buffer(128, 64);
 
-	g_set_pixel(buffer, 2, 0, 1);
+	
+	
 
-	g_clear(buffer);
-
-	g_set_pixel(buffer, 4, 0, 1);
-
-	vec2 x1 = {5, 10}, x2 = {20, 30};
-	g_draw_line(buffer, x1, x2, 1);
-	g_draw_line(buffer, vec2_sum(x1, x2), x1, 1);
-	g_draw_rect(buffer, vec2_create(0,0), vec2_create(40,50), 1);
 	return 0;
 }
 
@@ -73,6 +66,7 @@ void clear(int r, int g, int b, int a){
 int padding = 1; // Pixels
 int pixel_size = 3;
 
+int k = 0;
 void render(){
 
 	clear(0x22, 0x22, 0x22, 0xff);
@@ -91,6 +85,14 @@ void render(){
 			SDL_RenderFillRect(renderer, &pixelrect);
 		}
 	}
+
+	g_clear(buffer);
+
+	//g_fill_rect(buffer, vec2_create(k,0), vec2_create(10,10), 1);
+	g_draw_rect(buffer, vec2_create(k/10,0), vec2_create(10,10), 1);
+	g_draw_rect(buffer, vec2_create(100-k/5,20), vec2_create(10,10), 1);
+	g_fill_shape(buffer, vec2_create(12, 13));
+	k++;
 
 	//Update renderer
 	SDL_RenderPresent(renderer);
