@@ -7,4 +7,6 @@
 
 void g_draw_line(G_PixelBuffer * buffer, vec2 origin, vec2 end, int color);
 
+void g_draw_rect(G_PixelBuffer * buffer, vec2 origin, vec2 size, int color);
+
 #endif

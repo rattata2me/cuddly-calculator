@@ -26,3 +26,20 @@ void g_draw_line(G_PixelBuffer * buffer, vec2 origin, vec2 end, int color){
 		}
 	} 
 }
+
+// Crappy function TODO Fix this maybe?
+
+void g_draw_rect(G_PixelBuffer * buffer, vec2 origin, vec2 size, int color){
+
+	vec2 xvec = origin;
+	xvec.x = xvec.x + size.x;
+	vec2 yvec = origin;
+	yvec.y = yvec.y + size.y;
+	vec2 sumvec = vec2_sum(origin, size);
+
+	g_draw_line(buffer, origin, yvec, color);
+	g_draw_line(buffer, origin, xvec, color);
+	g_draw_line(buffer, xvec, sumvec, color);
+	g_draw_line(buffer, yvec, sumvec, color);
+
+}

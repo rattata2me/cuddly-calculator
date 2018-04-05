@@ -56,8 +56,8 @@ int init(){
 
 	vec2 x1 = {5, 10}, x2 = {20, 30};
 	g_draw_line(buffer, x1, x2, 1);
-	g_draw_line(buffer, vec2_add(x1, x2), x1, 1);
-
+	g_draw_line(buffer, vec2_sum(x1, x2), x1, 1);
+	g_draw_rect(buffer, vec2_create(0,0), vec2_create(40,50), 1);
 	return 0;
 }
 
