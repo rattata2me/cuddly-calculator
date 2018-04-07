@@ -1,6 +1,7 @@
 #include "graphics/renderer.h"
 
 
+
 // Bresenham's line algorithm TODO implement other line algorithm
 
 void g_draw_line(G_PixelBuffer * buffer, vec2 origin, vec2 end, int color){
@@ -58,54 +59,64 @@ void g_fill_rect(G_PixelBuffer * buffer, vec2 origin, vec2 size, int color){
 
 // TODO: Clean this up, and optimize it
 
-void internal_fill_line(G_PixelBuffer * buffer, vec2 point){
-
+void internal_fill_line(G_PixelBuffer * buffer, vec2 point, unsigned int color){
 	int x = point.x;
 
-	
+	// Negative color
+	int ncolor = color > 0 ? 0U : 1U;
 
-	// Set the x into an edge
-	while((g_get_pixel(buffer, (x-1), point.y) == 0) && (x > 0)){
+	// Set the x touching an edge.
+	while((g_get_pixel(buffer, (x-1), point.y) == ncolor) && (x > 0)){
 		x--;
+		g_set_pixel(buffer, x, point.y, color);
 	}
-	bool nwu = true;
-	bool nwd = true;
-	int s = x;
-	while((g_get_pixel(buffer, x, point.y) == 0) && (x < buffer->width)){
-		g_set_pixel(buffer, x, point.y, 1);
+	// Set the starting pixel
+	int b = x;
+
+	x = point.x;
+
+	// Draw the rest of the line
+	while((g_get_pixel(buffer, x, point.y) == ncolor) && (x < buffer->width)){
+		g_set_pixel(buffer, x, point.y, color);
 		x++;
 	}
+
+	// Set the final pixel location
 	int f = x;
-	x = s;
+	x = b;
+
+	// Check open path to call recursively the method
+	int dir[] = {1, -1};
+	bool nw[] = {true, true};
+	unsigned int up;
 	while(x < f){
-		if((point.y+1) < buffer->height){
-			int up = g_get_pixel(buffer, x, point.y+1);
-			if(up == 0 && nwu){
-				nwu = false;
-				internal_fill_line(buffer, vec2_create(x, point.y+1));
-			}else if(up == 1){
-				nwu = true;
-			}
-		}
-		if((point.y-1) >= 0){
-			int up = g_get_pixel(buffer, x, point.y-1);
-			if(up == 0 && nwd){
-				nwd = false;
-				internal_fill_line(buffer, vec2_create(x, point.y-1));
-			}else if(up == 1){
-				nwd = true;
+		for(int i = 0; i < 2; i++){
+
+			//	 TODO Also check in 8 directions.
+
+			if(((point.y+dir[i]) < buffer->height) && ((point.y+dir[i]) >= 0)){
+				up = g_get_pixel(buffer, x, (point.y+dir[i]));
+				if(up == (ncolor) && nw[i]){
+					nw[i] = false;
+					internal_fill_line(buffer, vec2_create(x, (point.y+dir[i])), color);
+				}else if(up == color){
+					nw[i] = true;
+				}
 			}
 		}
 		x++;
 	}
+
 
 }
 
-void g_fill_shape(G_PixelBuffer * buffer, vec2 point){
+void g_fill_shape(G_PixelBuffer * buffer, vec2 point, unsigned int color){
+
+	color = (color > 0U ? 1U : 0U);
 
 	// Check that the given pixel is blank
-	if(g_get_pixel(buffer, point.x, point.y) == 1) return;
+	if(g_get_pixel(buffer, point.x, point.y) == color) return;
 
-	internal_fill_line(buffer, point);
+	internal_fill_line(buffer, point, color);
 
 } 

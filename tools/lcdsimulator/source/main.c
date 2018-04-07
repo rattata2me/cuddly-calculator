@@ -89,9 +89,9 @@ void render(){
 	g_clear(buffer);
 
 	//g_fill_rect(buffer, vec2_create(k,0), vec2_create(10,10), 1);
-	g_draw_rect(buffer, vec2_create(k/10,0), vec2_create(10,10), 1);
+	g_draw_rect(buffer, vec2_create(k/10,1), vec2_create(10,10), 1);
 	g_draw_rect(buffer, vec2_create(100-k/5,20), vec2_create(10,10), 1);
-	g_fill_shape(buffer, vec2_create(12, 13));
+	g_fill_shape(buffer, vec2_create(12, 13), 1U);
 	k++;
 
 	//Update renderer

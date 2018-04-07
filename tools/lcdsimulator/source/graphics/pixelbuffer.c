@@ -77,11 +77,11 @@ int g_get_pixel(G_PixelBuffer * buffer, int x, int y){
 	unsigned int sum = 1U << ((G_MEMORY_UNIT-1) - rest);
 	sum = sum & (*gval);
 
-	if(sum == 0){
-		return 0;
+	if(sum == 0U){
+		return 0U;
 	}
 
-	return 1;
+	return 1U;
 }
 
 
