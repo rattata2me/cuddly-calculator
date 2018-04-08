@@ -1,15 +1,9 @@
 #ifndef CCALCLC_SRC_GRAPHICS_TEXTURE_H_
 #define CCALCLC_SRC_GRAPHICS_TEXTURE_H_
 
-extern unsigned int BYTE_SIZE;
+#include "graphics/pixelsurface.h"
 
-typedef struct{
 
-	unsigned int width;
-	unsigned int striplen;
-	unsigned int height;
-	unsigned char * pixels;
-
-} G_Texture;
+G_Surface * g_create_surface_from_pixels(unsigned int width, unsigned int height, unsigned char * pixels);
 
 #endif

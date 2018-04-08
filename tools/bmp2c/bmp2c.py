@@ -16,14 +16,17 @@ def convert_image(image_file, var_name):
 	img = Image.open(image_file)
 	img = img.convert("RGB")
 	size = img.size
-	sx = ((size[0] + (size[0] % BYTE_SIZE)) / BYTE_SIZE)
+	sx = ((size[0] + (BYTE_SIZE - (size[0] % BYTE_SIZE))) / BYTE_SIZE)
 	sy = size[1]
 	binary = []
 	for y in range(sy):
 		for x in range(sx):
 			byte = 0
-			for i in range(0, BYTE_SIZE):
-				pixel = img.getpixel(((x+i), y))
+			for i in range(BYTE_SIZE):
+				px = x*BYTE_SIZE+i
+				if px >= size[0]:
+					px = size[0]-1
+				pixel = img.getpixel((px, y))
 				val = 1
 				if pixel == (255, 255, 255):
 					val = 0

@@ -1,21 +1,19 @@
 #include "graphics/texture.h"
 
-unsigned int BYTE_SIZE = 8;
+G_Surface * g_create_surface_from_pixels(unsigned int width, unsigned int height, unsigned char * pixels){
 
-G_Texture * g_create_texture(unsigned int width, unsigned int height, char * pixels){
-
-	G_Texture * texture;
+	G_Surface * surface;
 
 	// Same system I used on the pixel buffer
-	int nrow = (width+(BYTE_SIZE - (width % BYTE_SIZE)))/BYTE_SIZE;
+	int nrow = (width+(G_MEMORY_UNIT - (width % G_MEMORY_UNIT)))/G_MEMORY_UNIT;
 
 	// Texture Allocation
-	tetxure = malloc(sizeof(G_Texture));
-	texture->width = width;
-	texture->striplen = nrow;
-	texture->height = height;
-	texture->pixels = pixels;
+	surface = malloc(sizeof(G_Surface));
+	surface->width = width;
+	surface->striplen = nrow;
+	surface->height = height;
+	surface->pixels = pixels;
 
-	return texture;
+	return surface;
 
 }

@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>
 #include "common.h"
-#include "graphics/pixelbuffer.h"
+#include "graphics/pixelsurface.h"
 #include "graphics/renderer.h"
-
+#include "graphics/texture.h"
+#include "logo.h"
 // Constant screen size
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -15,7 +16,7 @@ bool running = false;
 SDL_Window * window = NULL;
 SDL_Renderer * renderer = NULL;
 
-G_PixelBuffer * buffer;
+G_Surface * buffer, * texture;
 
 
 // Test values, just for fun, TODO: create a drawing library.
@@ -46,7 +47,9 @@ int init(){
 		return 1;
 	}
 
-	buffer = g_create_buffer(128, 64);
+	buffer = g_create_surface(128, 64);
+	texture = g_create_surface_from_pixels(logo_width, logo_height, logo_pixels);
+
 
 	return 0;
 }
@@ -85,10 +88,12 @@ void render(){
 
 	g_clear(buffer);
 
-	//g_fill_rect(buffer, vec2_create(k,0), vec2_create(10,10), 1);
-	g_draw_rect(buffer, vec2_create(k/10,1), vec2_create(10,10), 1);
-	g_draw_rect(buffer, vec2_create(100-k/5,20), vec2_create(10,10), 1);
-	g_fill_shape(buffer, vec2_create(12, 13), 1U);
+	
+	g_draw_surface(buffer, texture, vec2_create(-1,-5));
+	//g_draw_rect(buffer, vec2_create(k/10,1), vec2_create(10,10), 1);
+	//g_draw_rect(buffer, vec2_create(100-k/5,20), vec2_create(10,10), 1);
+	//g_fill_shape(buffer, vec2_create(12, 13), 1U);
+	//g_fill_shape(buffer, vec2_create(12, 13), 0U);
 	k++;
 
 	//Update renderer

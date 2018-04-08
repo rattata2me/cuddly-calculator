@@ -11,13 +11,12 @@ BUILD_DIRECTORY = build
 
 CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -g -Wall -pedantic -Werror
 
-_OBJECT_FILES = main.o common.o graphics/pixelbuffer.o graphics/renderer.o math/vec2.o
+_OBJECT_FILES = main.o common.o graphics/pixelsurface.o graphics/renderer.o math/vec2.o graphics/texture.o
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
 IMAGES := $(shell find $(IMAGES_DIRECTORY) -name '*.bmp')
 IMAGES_OBJECT_FILES := $(subst .bmp,.o, $(IMAGES))
 IMAGES_C_FILES := $(subst .bmp,.c, $(IMAGES))
-IMAGES_H_FILES := $(subst .bmp,.c, $(IMAGES))
 
 LIBS = `sdl2-config --cflags --libs` -lSDL2 
 
