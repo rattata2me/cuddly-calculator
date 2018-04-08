@@ -1,1 +1,3 @@
 build/*
+images/*
+!images/*.bmp

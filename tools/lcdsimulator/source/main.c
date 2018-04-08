@@ -48,9 +48,6 @@ int init(){
 
 	buffer = g_create_buffer(128, 64);
 
-	
-	
-
 	return 0;
 }
 
