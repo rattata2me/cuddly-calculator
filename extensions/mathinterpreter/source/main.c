@@ -2,8 +2,7 @@
 #include "mathinterpreter.h"
 
 int main(){
-
-	printf("%" PRId64 "\n", mathinterpreter_eval("78435.434+434-24232"));
+	printf("%" PRId64 "\n", mathinterpreter_eval("784+434-345+35*6-56/54"));
 
 	return 0;
 }

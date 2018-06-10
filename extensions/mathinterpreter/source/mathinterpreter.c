@@ -1,87 +1,80 @@
 #include "mathinterpreter.h"
 
+const char hierarchy[] = {
+	MI_MINUS,
+	MI_PLUS,
+	MI_DIV,
+	MI_MUL,
+	MI_NUM	
+};
 
-// Simple pow function, more reliability than math pow? TODO: Create specific function for base 10,
-int64_t mathinterpreter_pow(int64_t a, int x){
-	
-	int64_t val = 1;
-	for(int i = 0; i < x; i++){
-		val = val*a;
-	}
-	return val;
-}
+int a = 0;
 
+Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar){
 
-int64_t mathinterpreter_eval_mul(char * equation, int startchar, int ednchar){
-	return 1;
-}
-
-
-int64_t mathinterpreter_eval_sum(char * equation, int startchar, int endchar){
-
-
+	a ++;
+	if(a >= 50) return NULL;
 	bool par = false;
 
-	int last  = 0;
+	printf("Lvl: %i; Startchar: %i; Endchar: %i; ", hierarchy_level, startchar, endchar);
+	for(int i = startchar; i <= endchar; i++){
+		printf("%c", equation[i]);
+	}
+	printf("\n");
 
-	char sign = 1;
-
-	int64_t val = 0;
-
-	for(int i = 0; i <= endchar; i++){
+	if(hierarchy_level > 3){
+		Mi_Node * this = malloc(sizeof(Mi_Node));
+		this->num.type = MI_NUM;
+		this->num.value = 4;
+		return this;
+	}
+	
+	for(int i = startchar; i <= endchar; i++){
+		
 		if(equation[i] == MI_SUB_OPENER) par = true;
 		if(equation[i] == MI_SUB_CLOSER) par = false;
+		
+		if((!par) && (equation[i] == hierarchy[hierarchy_level])){
 
-		// TODO divide this into steps to track down syntax errors like open (
-		if((par == false) && (((equation[i] == MI_PLUS) || (equation[i] == MI_MINUS)) || (i == endchar))){
+			// TODO Add syntax error handlers
 
-			if(i == endchar) i++;
-			val = val + (sign * mathinterpreter_eval_mul(equation, last, i-1));
-			sign = (equation[i] == MI_MINUS) ? (-1) : (1);
-			last = i+1;
+			Mi_Node * a = mathinterpreter_read(hierarchy_level, equation, startchar, (i-1));
+			Mi_Node * b = mathinterpreter_read(hierarchy_level, equation, (i+1), endchar);
+
+			Mi_Node * this = malloc(sizeof(Mi_Node));
+			this->op.type = hierarchy[hierarchy_level];
+			this->op.a = a;
+			this->op.b = b;
+			return this; 
+
 		}
-
 	}
 
-	return val;
+	return mathinterpreter_read((hierarchy_level+1), equation, startchar, endchar);
+
+}
+
+void read_r(Mi_Node * node){
+/*
+	if(((Mi_Node * )node->op.a)->op.type == MI_NUM){
+		printf("%" PRId64 "\n", ((Mi_Node * )node->op.a)->num.value);
+	}else{
+		read_r(node->op.a);
+	}
+	if(((Mi_Node * )node->op.b)->op.type == MI_NUM){
+		printf("%" PRId64 "\n", ((Mi_Node * )node->op.b)->num.value);
+	}else{
+		read_r(node->op.b);
+	}
+*/
 }
 
 
 int64_t mathinterpreter_eval(char * equation){
 
 	int tsize = strlen(equation);
-
-	mathinterpreter_eval_sum(equation, 0, tsize-1);
-
-	return 1;
-}
-
-int8_t mathinterpreter_eval_char(char * character){
-
-	int8_t val = *character;
-	val = val - 0x30;  // Ascii number offset
-	return val;
-}
-
-
-bool mathinterpreter_is_number(char * character){
-
-	// Check ascii values from 0 to 9
-	return ((*character > 0x2F) && (*character < 0x3A));
-}
-
-
-int64_t mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
-
-	int64_t val = 0;
-
-	for(int i = startchar; i <= endchar; i++){
-
-		// Not really needed but idk
-		if(mathinterpreter_is_number(str+i)){
-			val = val + ((int64_t)mathinterpreter_eval_char(str+i))*mathinterpreter_pow(0xA, endchar-i);
-		}
-	}
-
-	return val;
+	Mi_Node * n = mathinterpreter_read(0, equation, 0, tsize-1);
+	read_r(n);
+	
+	return 3;
 }
