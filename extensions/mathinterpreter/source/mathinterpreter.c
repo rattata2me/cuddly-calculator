@@ -8,31 +8,127 @@ const char hierarchy[] = {
 	MI_NUM	
 };
 
-int a = 0;
+// Slow, but with this method I avoid float errors;
+int32_t mathinterpreter_pow(int32_t a, int x){
+	
+	int32_t val = 1;
+	for(int i = 0; i < x; i++){
+		val = val*a;
+	}
+	return val;
+}
+
+bool mathinterpreter_is_number(char * character){
+	// Check ascii values from 0 to 9
+	return ((*character > 0x2F) && (*character < 0x3A));
+}
+
+int8_t mathinterpreter_eval_char(char * character){
+
+	int8_t val = *character;
+	val = val - 0x30;  // Ascii number offset
+	return val;
+}
+
+float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
+	
+	//Comma position
+	int e = 0;
+
+	endchar = ((endchar-startchar) > 6 ? startchar+6 : endchar);
+
+	// TODO: limit number of commas and check for illegal characters
+	for(int i = startchar; (i <= endchar); i++){
+		if(*(str+i) == 0x2E){
+			e = i;
+		}
+	}
+
+	int32_t val = 0;
+	float val2 = 0;
+
+	int exp = 0;
+	int l = endchar - startchar - (e == 0 ? 0 : 1);
+	for(int i = startchar; (i <= endchar); i++){
+		if(mathinterpreter_is_number(str+i)){
+			if(exp < (e-startchar) || e == 0) val = val + 
+				mathinterpreter_eval_char(str+i)*mathinterpreter_pow(0xA,l-exp-(e == 0 ? 0 : endchar-e));
+			else val2 = val2 + 
+				mathinterpreter_eval_char(str+i)*(1.0f/mathinterpreter_pow(0xA,exp-(e-startchar)+1));
+			exp++;
+		}
+	}
+	printf("Number %f\n" , (e == 0 ? (float)val : val+val2));
+	return (e == 0 ? (float)val : val+val2);
+}
+
+/*
+// TODO FIX THIS
+float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
+
+	int32_t val = 0;
+	int e = 0;
+	for(int i = startchar; (i <= endchar) && (startchar+10); i++){
+		if(*(str+i) == 0x2E){
+			e = i;
+		}
+	}
+	for(int i = startchar; (i <= endchar) && (i < (startchar+10)); i++){
+		// Not really needed but idk
+		char t = i-((i >= e) && (e > 0) ? 1 : 0);
+		if(mathinterpreter_is_number(str+i)){
+			val = val + ((int32_t)mathinterpreter_eval_char(str+i))
+				*mathinterpreter_pow(0xA, (endchar-(e == 0 ? 0 : 1))-t);
+		}
+	}
+	float r = ((float)val/mathinterpreter_pow(0xA, (e > 0 ? endchar-e : 0)));
+	printf("Number: %f\n", r);
+	return r;
+}
+*/
+
 
 Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar){
 
-	a ++;
-	if(a >= 50) return NULL;
-	bool par = false;
+	int par = 0;
 
-	printf("Lvl: %i; Startchar: %i; Endchar: %i; ", hierarchy_level, startchar, endchar);
+	
+
+	// Debug information START
+	printf("Lvl: %c; Startchar: %i; Endchar: %i; String ", hierarchy[hierarchy_level], startchar, endchar);
 	for(int i = startchar; i <= endchar; i++){
 		printf("%c", equation[i]);
 	}
 	printf("\n");
 
+	if((equation[startchar] == MI_SUB_OPENER) && (equation[endchar] == MI_SUB_CLOSER)){
+		return mathinterpreter_read(0, equation, startchar+1, endchar-1);
+	}
+	//END
+
+
+
+	// Syntax error detected, this is mostly caused by double operator
+	if(startchar > endchar){
+		printf("Error\n");
+		return mathinterpreter_error(MI_ERR, "Syntax error");
+	}
+
+	// If it is a number
 	if(hierarchy_level > 3){
+
 		Mi_Node * this = malloc(sizeof(Mi_Node));
 		this->num.type = MI_NUM;
 		this->num.value = 4;
+		mathinterpreter_get_value_from_str(equation, startchar, endchar);
 		return this;
+
 	}
 	
 	for(int i = startchar; i <= endchar; i++){
 		
-		if(equation[i] == MI_SUB_OPENER) par = true;
-		if(equation[i] == MI_SUB_CLOSER) par = false;
+		if(equation[i] == MI_SUB_OPENER) par++;
+		if(equation[i] == MI_SUB_CLOSER) par--;
 		
 		if((!par) && (equation[i] == hierarchy[hierarchy_level])){
 
@@ -55,26 +151,27 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 }
 
 void read_r(Mi_Node * node){
-/*
-	if(((Mi_Node * )node->op.a)->op.type == MI_NUM){
-		printf("%" PRId64 "\n", ((Mi_Node * )node->op.a)->num.value);
-	}else{
-		read_r(node->op.a);
-	}
-	if(((Mi_Node * )node->op.b)->op.type == MI_NUM){
-		printf("%" PRId64 "\n", ((Mi_Node * )node->op.b)->num.value);
-	}else{
-		read_r(node->op.b);
-	}
-*/
+
+
+
 }
 
 
-int64_t mathinterpreter_eval(char * equation){
+int64_t mathinterpreter_eval(char * equation, int len){
 
-	int tsize = strlen(equation);
-	Mi_Node * n = mathinterpreter_read(0, equation, 0, tsize-1);
+	Mi_Node * n = mathinterpreter_read(0, equation, 0, len-1);
 	read_r(n);
 	
 	return 3;
 }
+
+Mi_Node * mathinterpreter_error(char code, char * error){
+
+	Mi_Node * this = malloc(sizeof(Mi_Node));
+	this->err.type = MI_ERR;
+	this->err.code = code;
+	this->err.error = error;
+
+	return this;
+}
+

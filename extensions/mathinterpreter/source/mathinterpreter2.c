@@ -65,7 +65,6 @@ int8_t mathinterpreter_eval_char(char * character){
 
 
 bool mathinterpreter_is_number(char * character){
-
 	// Check ascii values from 0 to 9
 	return ((*character > 0x2F) && (*character < 0x3A));
 }

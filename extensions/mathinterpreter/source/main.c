@@ -2,7 +2,10 @@
 #include "mathinterpreter.h"
 
 int main(){
-	printf("%" PRId64 "\n", mathinterpreter_eval("784+434-345+35*6-56/54"));
 
+	char equ[50];
+	printf("Enter input: ");
+	fgets(equ,50,stdin);
+	printf("Response %" PRId64 "\n", mathinterpreter_eval(equ, strlen(equ)-1));
 	return 0;
 }
