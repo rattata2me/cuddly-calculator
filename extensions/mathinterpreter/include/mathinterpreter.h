@@ -14,6 +14,7 @@
 #define MI_ERR 'E'
 #define MI_ERROR_SYNTAX 0x01
 #define MI_ERROR_DIV_BY_ZERO 0x02
+#define MI_ERROR_NONE 0x03
 
 extern const char hierarchy[5];
 

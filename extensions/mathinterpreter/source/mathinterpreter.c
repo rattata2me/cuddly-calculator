@@ -110,11 +110,11 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 	}
 	
-	for(int i = startchar; i <= endchar; i++){
+	for(int i = endchar; i >= startchar; i--){
 		
-		if(equation[i] == MI_SUB_OPENER) par++;
-		if(equation[i] == MI_SUB_CLOSER) par--;
-		
+		if(equation[i] == MI_SUB_OPENER) par--;
+		if(equation[i] == MI_SUB_CLOSER) par++;
+		printf("par %i\n", par);
 		if((!par) && (equation[i] == hierarchy[hierarchy_level])){
 
 			// TODO Add syntax error handlers
@@ -137,6 +137,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 
+	*error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 	switch(node->op.type){
 
 		case MI_NUM:
@@ -169,14 +170,14 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 			printf("Division a %f/b %f result = %f\n", a, b, a/b);
 			//Division by zero
 			if(b == 0.0f){
-				error = &mathinterpreter_error(MI_ERROR_DIV_BY_ZERO, 
-					"Can not divide by zero")->err;
+				*error = (mathinterpreter_error(MI_ERROR_DIV_BY_ZERO, 
+					"Can not divide by zero")->err);
 				return 0.0f;
 			}
 			return a/b;
 
 		default:
-			error = &node->err;
+			*error = node->err;
 			return 0.0f;
 	}
 
