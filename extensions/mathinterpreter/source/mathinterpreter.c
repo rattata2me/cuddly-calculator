@@ -1,8 +1,8 @@
 #include "mathinterpreter.h"
 
 const char hierarchy[] = {
-	MI_MINUS,
 	MI_PLUS,
+	MI_MINUS,
 	MI_DIV,
 	MI_MUL,
 	MI_NUM	
@@ -62,32 +62,6 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	return (e == 0 ? (float)val : val+val2);
 }
 
-/*
-// TODO FIX THIS
-float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
-
-	int32_t val = 0;
-	int e = 0;
-	for(int i = startchar; (i <= endchar) && (startchar+10); i++){
-		if(*(str+i) == 0x2E){
-			e = i;
-		}
-	}
-	for(int i = startchar; (i <= endchar) && (i < (startchar+10)); i++){
-		// Not really needed but idk
-		char t = i-((i >= e) && (e > 0) ? 1 : 0);
-		if(mathinterpreter_is_number(str+i)){
-			val = val + ((int32_t)mathinterpreter_eval_char(str+i))
-				*mathinterpreter_pow(0xA, (endchar-(e == 0 ? 0 : 1))-t);
-		}
-	}
-	float r = ((float)val/mathinterpreter_pow(0xA, (e > 0 ? endchar-e : 0)));
-	printf("Number: %f\n", r);
-	return r;
-}
-*/
-
-
 Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar){
 
 	int par = 0;
@@ -119,8 +93,8 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 		Mi_Node * this = malloc(sizeof(Mi_Node));
 		this->num.type = MI_NUM;
-		this->num.value = 4;
-		mathinterpreter_get_value_from_str(equation, startchar, endchar);
+		this->num.value = mathinterpreter_get_value_from_str(equation, startchar, endchar);
+		
 		return this;
 
 	}
@@ -150,19 +124,61 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 }
 
-void read_r(Mi_Node * node){
+float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 
+	switch(node->op.type){
 
+		case MI_NUM:
+			return node->num.value;
 
+		float a = 0.0f;
+		float b = 0.0f;
+
+		case MI_PLUS: ;
+			a = mathinterpreter_solve(node->op.a, error);
+			b = mathinterpreter_solve(node->op.b, error);
+			printf("Addition a %f + b %f result = %f\n", a, b, a+b);
+			return a+b;
+
+		case MI_MINUS: ;
+			a = mathinterpreter_solve(node->op.a, error);
+			b = mathinterpreter_solve(node->op.b, error);
+			printf("Substraction a %f - b %f result = %f\n", a, b, a-b);
+			return a-b;
+
+		case MI_MUL: ;
+			a = mathinterpreter_solve(node->op.a, error);
+			b = mathinterpreter_solve(node->op.b, error);
+			printf("Multiplication a %f* b %f result = %f\n", a, b, a*b);
+			return a*b;
+
+		case MI_DIV: ;
+			a = mathinterpreter_solve(node->op.a, error);
+			b = mathinterpreter_solve(node->op.b, error);
+			printf("Division a %f/b %f result = %f\n", a, b, a/b);
+			//Division by zero
+			if(b == 0.0f){
+				error = &mathinterpreter_error(MI_ERROR_DIV_BY_ZERO, 
+					"Can not divide by zero")->err;
+				return 0.0f;
+			}
+			return a/b;
+
+		default:
+			error = &node->err;
+			return 0.0f;
+	}
+
+	return 0.0f;
 }
 
 
-int64_t mathinterpreter_eval(char * equation, int len){
+float mathinterpreter_eval(char * equation, int len){
 
 	Mi_Node * n = mathinterpreter_read(0, equation, 0, len-1);
-	read_r(n);
-	
-	return 3;
+	Mi_Err_Node * error = NULL;
+
+	return mathinterpreter_solve(n, error);
 }
 
 Mi_Node * mathinterpreter_error(char code, char * error){

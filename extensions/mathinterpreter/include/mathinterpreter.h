@@ -13,6 +13,7 @@
 
 #define MI_ERR 'E'
 #define MI_ERROR_SYNTAX 0x01
+#define MI_ERROR_DIV_BY_ZERO 0x02
 
 extern const char hierarchy[5];
 
@@ -56,11 +57,13 @@ int8_t mathinterpreter_eval_char(char * character);
 
 int32_t mathinterpreter_pow(int32_t a, int x);
 
+float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error);
+
 bool mathinterpreter_is_number(char * character);
 
 Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar);
 
-int64_t mathinterpreter_eval(char * equation, int len);
+float mathinterpreter_eval(char * equation, int len);
 
 Mi_Node * mathinterpreter_error(char code, char * error);
 
