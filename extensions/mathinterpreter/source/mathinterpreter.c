@@ -3,8 +3,8 @@
 const char hierarchy[] = {
 	MI_PLUS,
 	MI_MINUS,
-	MI_DIV,
 	MI_MUL,
+	MI_DIV,
 	MI_NUM	
 };
 
@@ -84,6 +84,17 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
+		
+		//Negative void
+		printf("%c \n",equation[startchar]);
+		if(equation[startchar] == MI_MINUS && (equation[startchar+1] == MI_SUB_OPENER || mathinterpreter_is_number(equation+startchar+1))){
+			Mi_Node * this = malloc(sizeof(Mi_Node));
+			this->num.type = MI_NUM;
+			this->num.value = 0.0f;
+			return this;
+		}
+
+
 		printf("Error\n");
 		return mathinterpreter_error(MI_ERR, "Syntax error");
 	}
@@ -173,10 +184,9 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 }
 
 
-float mathinterpreter_eval(char * equation, int len){
+float mathinterpreter_eval(char * equation, int len, Mi_Err_Node * error){
 
 	Mi_Node * n = mathinterpreter_read(0, equation, 0, len-1);
-	Mi_Err_Node * error = NULL;
 
 	return mathinterpreter_solve(n, error);
 }

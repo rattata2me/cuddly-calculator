@@ -63,7 +63,7 @@ bool mathinterpreter_is_number(char * character);
 
 Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar);
 
-float mathinterpreter_eval(char * equation, int len);
+float mathinterpreter_eval(char * equation, int len, Mi_Err_Node * error);
 
 Mi_Node * mathinterpreter_error(char code, char * error);
 
