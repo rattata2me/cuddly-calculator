@@ -1,7 +1,7 @@
 
 # gcc is ok for this
 CC = gcc
-
+CCW = i686-w64-mingw32-gcc
 
 INCLUDE_DIRECTORY = include
 SOURCE_DIRECTORY = source
@@ -12,9 +12,10 @@ CFLAGS = -I$(INCLUDE_DIRECTORY) -g -Wall -pedantic -Werror
 _OBJECT_FILES = main.o mathinterpreter.o
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
-LIBS = 
+LIBS = -lm
 
 all: main
+
 
 
 .PHONY: makebuild

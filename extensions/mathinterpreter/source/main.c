@@ -8,6 +8,7 @@ int main(){
 		printf("Enter input: ");
 		fgets(equ,50,stdin);
 		Mi_Err_Node error;
+		error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 		float res = mathinterpreter_eval(equ, strlen(equ)-1, &error);
 		if(error.code == MI_ERROR_NONE){
 			printf("Response %f\n", res);

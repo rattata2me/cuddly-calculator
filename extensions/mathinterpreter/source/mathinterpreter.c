@@ -5,8 +5,11 @@ const char hierarchy[] = {
 	MI_MINUS,
 	MI_MUL,
 	MI_DIV,
+	MI_POW,
 	MI_NUM	
 };
+
+
 
 // Slow, but with this method I avoid float errors;
 int32_t mathinterpreter_pow(int32_t a, int x){
@@ -21,6 +24,13 @@ int32_t mathinterpreter_pow(int32_t a, int x){
 bool mathinterpreter_is_number(char * character){
 	// Check ascii values from 0 to 9
 	return ((*character > 0x2F) && (*character < 0x3A));
+}
+
+bool mathinterpreter_internal_is_op(char * character){
+	for(int i = 0; i < MI_OP_SIZE-1; i++){
+		if(hierarchy[i] == *character) return true;
+	}
+	return false;
 }
 
 int8_t mathinterpreter_eval_char(char * character){
@@ -62,11 +72,115 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	return (e == 0 ? (float)val : val+val2);
 }
 
-Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar){
+Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int endchar){
 
+	int endfun = startchar;
+	for(int i = startchar; i<=endchar; i++){
+		if(*(str+startchar) == MI_SUB_OPENER){
+			endfun = i-1;
+		}
+	}
+
+	if(endfun > startchar) return mathinterpreter_read(0, str, startchar, endchar);
+	
+	Mi_Node * one = malloc(sizeof(Mi_Node));
+	one->num.type = MI_NUM;
+	one->num.value = 1.0f;
+	return one;
+}
+
+Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar){
+
+	// One object
+	Mi_Node * one = malloc(sizeof(Mi_Node));
+	one->num.type = MI_NUM;
+	one->num.value = 1.0f;
+
+	//Memory allocation for an empty mul
+	Mi_Node * this = malloc(sizeof(Mi_Node));
+	this->op.type = MI_MUL;
+	this->op.a = one;
+	this->op.b = one;
+
+	Mi_Node * current = this;
+
+	char ltype = MI_NUM;
+	int li = startchar;
 	int par = 0;
 
-	
+	for(int i = startchar; i <= endchar+1; i++){
+		
+		if(equation[i] == MI_SUB_OPENER) par--;
+
+		if(equation[i] == MI_SUB_CLOSER) par++;
+
+		char ntype = 0;
+		if(i > endchar) ntype = (ltype == MI_NUM ? MI_FUN : MI_NUM);
+		else{
+			ntype = (mathinterpreter_is_number(equation+i) || (equation[i]) == 0x2E) ? MI_NUM : MI_FUN;
+			if(par) ntype = MI_FUN;
+		}
+		char val = ltype - ntype;
+		printf("ltype = %c, ntype = %c, val = %i, i = %i\n", ltype, ntype, val, i);
+		if(i!= startchar){
+			if(val == MI_NUM - MI_FUN){
+				
+				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
+				addcurrent->op.type = MI_MUL;
+					
+				Mi_Node * number = malloc(sizeof(Mi_Node));
+				number->num.type = MI_NUM;
+				number->num.value = mathinterpreter_get_value_from_str(equation, li, i-1);
+
+				addcurrent->op.a = number;
+				addcurrent->op.b = one;
+
+				current->op.b = addcurrent;
+				current = addcurrent;
+
+				// Debug
+				printf("Number!! ");
+				for(int j = li; j < i; j++){
+					printf("%c", equation[j]);
+				}
+				printf("\n");
+
+				li = i;
+
+				
+				
+				
+
+			}else if(val != 0){
+
+				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
+				addcurrent->op.type = MI_MUL;
+
+				addcurrent->op.a = mathinterpreter_get_value_from_function(equation, li, i-1);
+				addcurrent->op.b = one;
+
+				current->op.b = addcurrent;
+				current = addcurrent;
+
+				// Debug
+				printf("Function!! ");
+				for(int j = li; j < i; j++){
+					printf("%c", equation[j]);
+				}
+				printf("\n");
+
+				li = i;
+				
+				
+			}
+		}
+		ltype = ntype;
+	}
+	return this;
+}
+
+Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startchar, int endchar){
+
 
 	// Debug information START
 	printf("Lvl: %c; Startchar: %i; Endchar: %i; String ", hierarchy[hierarchy_level], startchar, endchar);
@@ -74,20 +188,16 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 		printf("%c", equation[i]);
 	}
 	printf("\n");
-
-	if((equation[startchar] == MI_SUB_OPENER) && (equation[endchar] == MI_SUB_CLOSER)){
-		return mathinterpreter_read(0, equation, startchar+1, endchar-1);
-	}
 	//END
-
-
+	
+	if(equation[endchar] == MI_SUB_CLOSER && equation[startchar] == MI_SUB_OPENER)
+		return mathinterpreter_read(0, equation, startchar+1, endchar-1);
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
 		
-		//Negative void
-		printf("%c \n",equation[startchar]);
-		if(equation[startchar] == MI_MINUS && (equation[startchar+1] == MI_SUB_OPENER || mathinterpreter_is_number(equation+startchar+1))){
+		//Negative void TODO Fix this for functions
+		if(equation[startchar] == MI_MINUS && !mathinterpreter_internal_is_op(equation+startchar+1)){
 			Mi_Node * this = malloc(sizeof(Mi_Node));
 			this->num.type = MI_NUM;
 			this->num.value = 0.0f;
@@ -96,26 +206,26 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 
 		printf("Error\n");
-		return mathinterpreter_error(MI_ERR, "Syntax error");
+		return mathinterpreter_error(MI_ERROR_SYNTAX, "Syntax error");
 	}
 
 	// If it is a number
-	if(hierarchy_level > 3){
+	if(hierarchy_level > (MI_OP_SIZE-2)){
 
-		Mi_Node * this = malloc(sizeof(Mi_Node));
-		this->num.type = MI_NUM;
-		this->num.value = mathinterpreter_get_value_from_str(equation, startchar, endchar);
-		
-		return this;
+		return mathinterpreter_read_mono(equation, startchar, endchar);
 
 	}
 	
+	int par = 0;
+
 	for(int i = endchar; i >= startchar; i--){
 		
 		if(equation[i] == MI_SUB_OPENER) par--;
 		if(equation[i] == MI_SUB_CLOSER) par++;
-		printf("par %i\n", par);
-		if((!par) && (equation[i] == hierarchy[hierarchy_level])){
+
+		int part = par < 0 ? 0 : par;
+
+		if((!part) && (equation[i] == hierarchy[hierarchy_level])){
 
 			// TODO Add syntax error handlers
 
@@ -130,6 +240,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 		}
 	}
+	if(par != 0) return mathinterpreter_error(MI_ERROR_SYNTAX, "Syntax error");
 
 	return mathinterpreter_read((hierarchy_level+1), equation, startchar, endchar);
 
@@ -137,7 +248,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 
-	*error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
+	
 	switch(node->op.type){
 
 		case MI_NUM:
@@ -161,7 +272,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_MUL: ;
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Multiplication a %f* b %f result = %f\n", a, b, a*b);
+			printf("Multiplication a %f * b %f result = %f\n", a, b, a*b);
 			return a*b;
 
 		case MI_DIV: ;
@@ -175,6 +286,12 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 				return 0.0f;
 			}
 			return a/b;
+
+		case MI_POW:
+			a = mathinterpreter_solve(node->op.a, error);
+			b = mathinterpreter_solve(node->op.b, error);
+			printf("Power a %f ^ b %f result = %f\n", a, b, powf(a, b));
+			return powf(a, b);
 
 		default:
 			*error = node->err;
