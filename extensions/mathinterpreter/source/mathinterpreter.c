@@ -13,7 +13,7 @@ const char hierarchy[] = {
 
 // Slow, but with this method I avoid float errors;
 int32_t mathinterpreter_pow(int32_t a, int x){
-	
+
 	int32_t val = 1;
 	for(int i = 0; i < x; i++){
 		val = val*a;
@@ -68,24 +68,72 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 			exp++;
 		}
 	}
-	printf("Number %f\n" , (e == 0 ? (float)val : val+val2));
 	return (e == 0 ? (float)val : val+val2);
 }
 
 Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int endchar){
 
-	int endfun = startchar;
-	for(int i = startchar; i<=endchar; i++){
-		if(*(str+startchar) == MI_SUB_OPENER){
-			endfun = i-1;
-		}
-	}
-
-	if(endfun > startchar) return mathinterpreter_read(0, str, startchar, endchar);
-	
 	Mi_Node * one = malloc(sizeof(Mi_Node));
 	one->num.type = MI_NUM;
 	one->num.value = 1.0f;
+
+
+	int endfun = startchar;
+	for(int i = startchar; i<=endchar; i++){
+		if(*(str+i) == MI_SUB_OPENER){
+			endfun = i;
+			break;
+		}
+	}
+
+	// Only called if the function is just a parenthesis
+	if(endfun == startchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
+	
+	// Memory allocation for the function
+	Mi_Node * fun = malloc(sizeof(Mi_Fun_Node));
+	fun->fun.type = MI_FUN;
+
+	//Read arguments
+	Mi_Args * args = malloc(sizeof(Mi_Args));
+
+	fun->fun.args = args; // Set function arguments
+
+	if(endfun+1 == endchar){ // no arguments
+		args->size = 0;
+		return fun;
+	}
+
+	
+
+	// stupid c...
+	int size = 0;
+	for(int i = endfun+1; i <= endchar; i++){
+		if(*(str+i) == MI_COMMA || i == endchar){
+			size++;
+		}
+	}
+	args->size = size;
+
+	printf("Size %i\n", size);
+	
+	Mi_Node ** nodearg = malloc(sizeof(Mi_Node *)*size);
+	int lc = endfun;
+	int c = 0;
+	for(int i = endfun+1; i <= endchar; i++){
+		if(*(str+i) == MI_COMMA || i == endchar){
+			*(nodearg+c) = mathinterpreter_read(0, str, lc+1, i-1); 
+			c++;
+			for(int j = lc+1; j < i; j++){
+
+				printf("%c", *(str+j));
+			}
+			printf("\n");
+			lc = i;
+		}
+	}
+	args->args = nodearg;
+
+	
 	return one;
 }
 
@@ -108,22 +156,45 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 	int li = startchar;
 	int par = 0;
 
+	char ntype = 0;
+
 	for(int i = startchar; i <= endchar+1; i++){
-		
+
+
+		// Parenthesis stuff
 		if(equation[i] == MI_SUB_OPENER) par--;
 
 		if(equation[i] == MI_SUB_CLOSER) par++;
 
-		char ntype = 0;
+
+		
+
+		// Get the new type of character
 		if(i > endchar) ntype = (ltype == MI_NUM ? MI_FUN : MI_NUM);
 		else{
+
+			if(equation[i] == MI_SUB_CLOSER && par == 0){
+		
+				ltype = -1; // If a parenthesis ends, there is a new function
+				i++;
+
+			}
+
 			ntype = (mathinterpreter_is_number(equation+i) || (equation[i]) == 0x2E) ? MI_NUM : MI_FUN;
 			if(par) ntype = MI_FUN;
 		}
-		char val = ltype - ntype;
+		char val = ltype - ntype; // this simplify a lot the logic
+
+		
 		printf("ltype = %c, ntype = %c, val = %i, i = %i\n", ltype, ntype, val, i);
+		
 		if(i!= startchar){
+			
+
+			// This is true if the program has found the start of a function,
 			if(val == MI_NUM - MI_FUN){
+
+				// Read the nummber
 				
 				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
 				addcurrent->op.type = MI_MUL;
@@ -149,9 +220,16 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 
 				
 				
-				
+			
+			// Only true when comming from a function to a number sin()_(here)_3
+			}else if(val != 0 || ltype == -1){
 
-			}else if(val != 0){
+				// Debug
+				printf("Function!! ");
+				for(int j = li; j < i; j++){
+					printf("%c", equation[j]);
+				}
+				printf("\n");
 
 				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
 				addcurrent->op.type = MI_MUL;
@@ -162,19 +240,14 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 				current->op.b = addcurrent;
 				current = addcurrent;
 
-				// Debug
-				printf("Function!! ");
-				for(int j = li; j < i; j++){
-					printf("%c", equation[j]);
-				}
-				printf("\n");
+				
 
 				li = i;
 				
 				
 			}
 		}
-		ltype = ntype;
+		ltype = ntype; // Set the ltype to keep track of the prev. char.
 	}
 	return this;
 }
@@ -190,8 +263,9 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 	printf("\n");
 	//END
 	
-	if(equation[endchar] == MI_SUB_CLOSER && equation[startchar] == MI_SUB_OPENER)
-		return mathinterpreter_read(0, equation, startchar+1, endchar-1);
+	//Easy fix
+	// if(equation[endchar] == MI_SUB_CLOSER && equation[startchar] == MI_SUB_OPENER)
+	//	return mathinterpreter_read(0, equation, startchar+1, endchar-1);
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
@@ -257,25 +331,25 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		float a = 0.0f;
 		float b = 0.0f;
 
-		case MI_PLUS: ;
+		case MI_PLUS:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Addition a %f + b %f result = %f\n", a, b, a+b);
 			return a+b;
 
-		case MI_MINUS: ;
+		case MI_MINUS:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Substraction a %f - b %f result = %f\n", a, b, a-b);
 			return a-b;
 
-		case MI_MUL: ;
+		case MI_MUL:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Multiplication a %f * b %f result = %f\n", a, b, a*b);
 			return a*b;
 
-		case MI_DIV: ;
+		case MI_DIV:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Division a %f/b %f result = %f\n", a, b, a/b);

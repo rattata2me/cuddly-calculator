@@ -14,6 +14,7 @@
 #define MI_POW '^'
 #define MI_SUB_OPENER '('
 #define MI_SUB_CLOSER ')'
+#define MI_COMMA ','
 
 #define MI_ERR 'E'
 #define MI_ERROR_SYNTAX 0x01
@@ -33,6 +34,21 @@ typedef struct{
 
 typedef struct{
 
+	int size;
+	void * args;
+
+} Mi_Args;
+
+typedef struct{
+
+	char type;
+	int fun_type;
+	Mi_Args * args;
+
+} Mi_Fun_Node;
+
+typedef struct{
+
 	char type;
 
 	void * a;
@@ -40,8 +56,7 @@ typedef struct{
 
 } Mi_Op_Node;
 
-typedef struct
-{
+typedef struct{
 	
 	char type;
 
@@ -55,6 +70,7 @@ typedef union{
 
 	Mi_Op_Node op;
 	Mi_Num_Node num;
+	Mi_Fun_Node fun;
 	Mi_Err_Node err;
 
 } Mi_Node;
