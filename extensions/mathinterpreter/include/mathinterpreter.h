@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+
+// Character code
 #define MI_NUM 'N'
 #define MI_FUN 'F'
 #define MI_PLUS '+'
@@ -16,6 +18,7 @@
 #define MI_SUB_CLOSER ')'
 #define MI_COMMA ','
 
+// Errors
 #define MI_ERR 'E'
 #define MI_ERROR_SYNTAX 0x01
 #define MI_ERROR_DIV_BY_ZERO 0x02
@@ -23,6 +26,15 @@
 
 #define MI_OP_SIZE 6
 extern const char hierarchy[MI_OP_SIZE];
+
+//Functions, need to be defined from longest to shortest in alphabetical order
+#define MI_FUN_SIN "sin"
+#define MI_FUN_COS "cos"
+
+#define MI_FUN_SIZE 2
+extern const char * functions[MI_FUN_SIZE];
+extern const int functions_size[MI_FUN_SIZE]; // C...
+
 
 typedef struct{
 
@@ -82,6 +94,8 @@ int32_t mathinterpreter_pow(int32_t a, int x);
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error);
 
 bool mathinterpreter_is_number(char * character);
+
+int mathinterpreter_get_function_code(char * str, int startchar, int endchar);
 
 Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar);
 

@@ -1,5 +1,7 @@
 #include "mathinterpreter.h"
 
+
+// Overall hierarchy
 const char hierarchy[] = {
 	MI_PLUS,
 	MI_MINUS,
@@ -9,6 +11,22 @@ const char hierarchy[] = {
 	MI_NUM	
 };
 
+
+// Functions, TODO Implement this in a proper way
+const char * functions[] = {
+	MI_FUN_COS,
+	MI_FUN_SIN
+};
+const int functions_size[] = {
+	3,
+	3
+};
+
+// This method is crappy af
+char functions_search_bool[] = {
+	0,
+	0
+};
 
 
 // Slow, but with this method I avoid float errors;
@@ -71,6 +89,26 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	return (e == 0 ? (float)val : val+val2);
 }
 
+int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
+	
+	int code = -1;
+	for(int i = startchar; i <= endchar; i++){
+		for(int j = 0; j < MI_FUN_SIZE; j++){
+			if(functions_size[j] > (i-startchar)){
+				if(functions[j][i] != str[i]) functions_search_bool[j] = 1;
+			}else functions_search_bool[j] = 1;
+		}
+		printf("%c", *(str+i));
+	}
+	for(int i = 0; i < MI_FUN_SIZE; i++){
+		if(!functions_search_bool[i] && startchar != endchar && 
+			endchar-startchar == functions_size[i]-1) code = i;
+		functions_search_bool[i] = 0;
+	}
+	printf("%i code\n", code);
+	return code;
+}
+
 Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int endchar){
 
 	Mi_Node * one = malloc(sizeof(Mi_Node));
@@ -78,7 +116,7 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	one->num.value = 1.0f;
 
 
-	int endfun = startchar;
+	int endfun = endchar;
 	for(int i = startchar; i<=endchar; i++){
 		if(*(str+i) == MI_SUB_OPENER){
 			endfun = i;
@@ -87,18 +125,21 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	}
 
 	// Only called if the function is just a parenthesis
-	if(endfun == startchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
+	if(endfun == startchar && startchar != endchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
 	
 	// Memory allocation for the function
 	Mi_Node * fun = malloc(sizeof(Mi_Fun_Node));
 	fun->fun.type = MI_FUN;
+
+	//Get function code based on name string
+	mathinterpreter_get_function_code(str, startchar, endchar);
 
 	//Read arguments
 	Mi_Args * args = malloc(sizeof(Mi_Args));
 
 	fun->fun.args = args; // Set function arguments
 
-	if(endfun+1 == endchar){ // no arguments
+	if(endfun+1 == endchar || startchar == endchar){ // no arguments
 		args->size = 0;
 		return fun;
 	}
@@ -366,6 +407,9 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Power a %f ^ b %f result = %f\n", a, b, powf(a, b));
 			return powf(a, b);
+
+		case MI_FUN:
+			
 
 		default:
 			*error = node->err;
