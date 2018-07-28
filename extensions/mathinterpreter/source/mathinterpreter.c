@@ -95,7 +95,7 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 	for(int i = startchar; i <= endchar; i++){
 		for(int j = 0; j < MI_FUN_SIZE; j++){
 			if(functions_size[j] > (i-startchar)){
-				if(functions[j][i] != str[i]) functions_search_bool[j] = 1;
+				if(functions[j][i-startchar] != str[i]) functions_search_bool[j] = 1;
 			}else functions_search_bool[j] = 1;
 		}
 		printf("%c", *(str+i));
@@ -119,36 +119,37 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	int endfun = endchar;
 	for(int i = startchar; i<=endchar; i++){
 		if(*(str+i) == MI_SUB_OPENER){
-			endfun = i;
+			endfun = i-1;
 			break;
 		}
 	}
 
 	// Only called if the function is just a parenthesis
-	if(endfun == startchar && startchar != endchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
+	if(endfun+1 == startchar && startchar != endchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
 	
 	// Memory allocation for the function
 	Mi_Node * fun = malloc(sizeof(Mi_Fun_Node));
 	fun->fun.type = MI_FUN;
 
 	//Get function code based on name string
-	mathinterpreter_get_function_code(str, startchar, endchar);
+	fun->fun.fun_type = mathinterpreter_get_function_code(str, startchar, endfun);
 
 	//Read arguments
 	Mi_Args * args = malloc(sizeof(Mi_Args));
 
 	fun->fun.args = args; // Set function arguments
 
-	if(endfun+1 == endchar || startchar == endchar){ // no arguments
+	if(endfun+2 == endchar || startchar == endchar){ // no arguments
 		args->size = 0;
+
 		return fun;
 	}
 
-	
+		
 
 	// stupid c...
 	int size = 0;
-	for(int i = endfun+1; i <= endchar; i++){
+	for(int i = endfun+2; i <= endchar; i++){
 		if(*(str+i) == MI_COMMA || i == endchar){
 			size++;
 		}
@@ -158,11 +159,12 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	printf("Size %i\n", size);
 	
 	Mi_Node ** nodearg = malloc(sizeof(Mi_Node *)*size);
-	int lc = endfun;
+	int lc = endfun+1;
 	int c = 0;
-	for(int i = endfun+1; i <= endchar; i++){
+	for(int i = endfun+2; i <= endchar; i++){
 		if(*(str+i) == MI_COMMA || i == endchar){
-			*(nodearg+c) = mathinterpreter_read(0, str, lc+1, i-1); 
+			Mi_Node * node = mathinterpreter_read(0, str, lc+1, i-1);
+			nodearg[c] = node; 
 			c++;
 			for(int j = lc+1; j < i; j++){
 
@@ -175,7 +177,7 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	args->args = nodearg;
 
 	
-	return one;
+	return fun;
 }
 
 Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar){
@@ -369,6 +371,23 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_NUM:
 			return node->num.value;
 
+		case MI_FUN:
+
+			switch(node->fun.fun_type){
+				// TODO Create a better method
+				case 0: // Cos
+					if(node->fun.args->size == 1){
+						printf("AAAAAAAH \n");
+						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
+						printf("%f\n", a);
+						return cos(a);
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+
+				default:
+					*error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid function name")->err;
+					return 1.0f;
+			}
+
 		float a = 0.0f;
 		float b = 0.0f;
 
@@ -406,10 +425,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
 			printf("Power a %f ^ b %f result = %f\n", a, b, powf(a, b));
-			return powf(a, b);
-
-		case MI_FUN:
-			
+			return powf(a, b);	
 
 		default:
 			*error = node->err;
