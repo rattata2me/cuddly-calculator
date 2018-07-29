@@ -37,7 +37,7 @@ PYTHON = python
 BMP2C = ../bmp2c/bmp2c.py
 
 $(IMAGES_DIRECTORY)/%.c: $(IMAGES_DIRECTORY)/%.bmp
-	$(PYTHON) $(BMP2C) $<
+	$(PYTHON) $(BMP2C) image $<
 
 $(IMAGES_DIRECTORY)/%.o: $(IMAGES_DIRECTORY)/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)

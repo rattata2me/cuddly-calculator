@@ -29,7 +29,7 @@ char functions_search_bool[] = {
 };
 
 
-// Slow, but with this method I avoid float errors;
+// Slow, but with this method I avoid float errors; TODO use the 2 trick
 int32_t mathinterpreter_pow(int32_t a, int x){
 
 	int32_t val = 1;
@@ -58,6 +58,8 @@ int8_t mathinterpreter_eval_char(char * character){
 	return val;
 }
 
+
+// This method is essential when transforming from char array to float
 float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
 	
 	//Comma position
@@ -89,6 +91,8 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	return (e == 0 ? (float)val : val+val2);
 }
 
+
+// Basic char * comparison
 int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 	
 	int code = -1;
@@ -109,12 +113,8 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 	return code;
 }
 
+// This function takes in the function string ex. "cos()" and returns its corresponding Mi_Node
 Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int endchar){
-
-	Mi_Node * one = malloc(sizeof(Mi_Node));
-	one->num.type = MI_NUM;
-	one->num.value = 1.0f;
-
 
 	int endfun = endchar;
 	for(int i = startchar; i<=endchar; i++){
@@ -147,7 +147,7 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 
 		
 
-	// stupid c...
+	// stupid c... search comma
 	int size = 0;
 	for(int i = endfun+2; i <= endchar; i++){
 		if(*(str+i) == MI_COMMA || i == endchar){
@@ -180,18 +180,20 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 	return fun;
 }
 
-Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar){
-
-	// One object
+Mi_Node * one(){
 	Mi_Node * one = malloc(sizeof(Mi_Node));
 	one->num.type = MI_NUM;
 	one->num.value = 1.0f;
+	return one;
+}
+
+Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar){
 
 	//Memory allocation for an empty mul
 	Mi_Node * this = malloc(sizeof(Mi_Node));
 	this->op.type = MI_MUL;
-	this->op.a = one;
-	this->op.b = one;
+	this->op.a = one();
+	this->op.b = one();
 
 	Mi_Node * current = this;
 
@@ -247,7 +249,7 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 				number->num.value = mathinterpreter_get_value_from_str(equation, li, i-1);
 
 				addcurrent->op.a = number;
-				addcurrent->op.b = one;
+				addcurrent->op.b = one();
 
 				current->op.b = addcurrent;
 				current = addcurrent;
@@ -278,7 +280,7 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 				addcurrent->op.type = MI_MUL;
 
 				addcurrent->op.a = mathinterpreter_get_value_from_function(equation, li, i-1);
-				addcurrent->op.b = one;
+				addcurrent->op.b = one();
 
 				current->op.b = addcurrent;
 				current = addcurrent;
@@ -305,10 +307,6 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 	}
 	printf("\n");
 	//END
-	
-	//Easy fix
-	// if(equation[endchar] == MI_SUB_CLOSER && equation[startchar] == MI_SUB_OPENER)
-	//	return mathinterpreter_read(0, equation, startchar+1, endchar-1);
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
@@ -435,12 +433,35 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 	return 0.0f;
 }
 
+void mathinterpreter_free(Mi_Node * node){
+	switch(node->op.type){
+		case MI_NUM:
+			break;
+		
+		case MI_FUN:
+			for(int i = 0; i < node->fun.args->size; i++){
+				mathinterpreter_free(*((Mi_Node**)node->fun.args->args+i));
+			}
+			break;
+
+		default:
+			if(node->op.type == MI_PLUS || node->op.type == MI_PLUS || 
+				node->op.type == MI_MUL || node->op.type == MI_DIV || node->op.type == MI_POW){
+				mathinterpreter_free(node->op.a);
+				mathinterpreter_free(node->op.b);
+			}
+	}
+	free(node);
+}
 
 float mathinterpreter_eval(char * equation, int len, Mi_Err_Node * error){
 
-	Mi_Node * n = mathinterpreter_read(0, equation, 0, len-1);
+	Mi_Node * node = mathinterpreter_read(0, equation, 0, len-1);
 
-	return mathinterpreter_solve(n, error);
+	float r = mathinterpreter_solve(node, error);
+	mathinterpreter_free(node);
+
+	return r;
 }
 
 Mi_Node * mathinterpreter_error(char code, char * error){

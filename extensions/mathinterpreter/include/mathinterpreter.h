@@ -109,4 +109,6 @@ float mathinterpreter_eval(char * equation, int len, Mi_Err_Node * error);
 
 Mi_Node * mathinterpreter_error(char code, char * error);
 
+void mathinterpreter_free(Mi_Node * node);
+
 #endif
