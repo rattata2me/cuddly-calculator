@@ -1,10 +1,10 @@
-
+#!/usr/bin/env python
 
 # Version 0.1
 VERSION = 0.1
 
 import PIL
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 import sys
 import os
 
@@ -78,6 +78,9 @@ def convert_font(image_folder, var_name):
 		if ".bmp" in i and i.split(".")[0]:
 			image_files.append(i.split(".")[0])
 
+	var_name_file = var_name
+	var_name = (var_name.split("/"))[-1]
+
 	upper_str = "" \
 	"// Auto-generated .C Image file " + str(VERSION) + "\n" \
 	"\nunsigned char"
@@ -86,6 +89,7 @@ def convert_font(image_folder, var_name):
 	indices = []
 
 	size = [0,0]
+	g = 0
 	for image_file in image_files:
 		indices.append(image_file[0])
 		image_file = image_folder + "/" + image_file + ".bmp"
@@ -111,13 +115,14 @@ def convert_font(image_folder, var_name):
 
 		binary_str = "\n\t" + get_binary_str(binary).replace("\n", "\n\t")
 		upper_str += binary_str + ","
+		g += 1
 
 	upper_str = upper_str[:-1]
 	upper_str += "\n}\n\nchar " + var_name + "_indices[] = {\n"
 	c = 0
 	for i in indices:
 		if c == 0:
-			upper_str += "\t"
+			upper_str += "\n\t"
 
 		upper_str += str(hex(ord(i))) + ", "
 		c += 1
@@ -128,9 +133,44 @@ def convert_font(image_folder, var_name):
 	upper_str += "\n\n" + "unsigned int " + var_name + "_width = " + str(int(size[0])) + ";"
 	upper_str += "\n" + "unsigned int " + var_name + "_height = " + str(int(size[1])) + ";"
 
-	print upper_str
+	header_str = "" \
+	"// Auto-generated Header Image file " + str(VERSION) + "\n" \
+	"#ifndef CCALCLC_SRC_FONTS_" + var_name + "_H_\n" \
+	"#define CCALCLC_SRC_FONTS_" + var_name + "_H_\n" \
+	"extern unsigned char " + var_name + "_pixels[][" + str(g) + "];\n" \
+	"extern unsigned int " + var_name + "_width;\n" \
+	"extern unsigned int " + var_name + "_height;\n" \
+	"#endif\n"
+	output_file = open(var_name_file+".h", "w")
+	output_file.write(header_str)
+	output_file.close()
+
+	output_file = open(var_name_file+".c", "w")
+	output_file.write(upper_str)
+	output_file.close()
+
+chr_map = open('ASCII.txt', 'r').read()
+
+def generatefont_internal(font_name, size, folder):
+
+	if not os.path.exists(folder):
+		os.makedirs(folder)
+
+	for i in chr_map:
+		i = ord(i)
+		font = ImageFont.truetype(font_name, size-3)
+
+		canvas = Image.new('RGB', (size, size), "white")
+
+		draw = ImageDraw.Draw(canvas)
+		draw.fontmode = "1"
+		draw.text((2,0), chr(i), 'black', font)
+
+		canvas.save(folder + "/" + chr(i)+".bmp", "BMP")
 
 
+def generatefont_external(font_name):
+	pass
 
 
 
@@ -149,3 +189,8 @@ if len(sys.argv) > 0:
 		if len(sys.argv) == 3:
 			var_name = sys.argv[2]
 			convert_font(sys.argv[1], var_name)
+
+	if sys.argv[0] == "gen-font":
+		if len(sys.argv) == 4:
+			generatefont_internal(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+

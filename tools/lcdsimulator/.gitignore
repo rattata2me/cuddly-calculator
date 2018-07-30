@@ -1,3 +1,5 @@
 build/*
 images/*
 !images/*.bmp
+!images/fonts/
+!images/fonts/*
