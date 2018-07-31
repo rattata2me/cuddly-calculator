@@ -8,17 +8,29 @@ SOURCE_DIRECTORY = source
 IMAGES_DIRECTORY = images
 BUILD_DIRECTORY = build
 
+GRAPHICS = SDL_SIM
 
-CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -g -Wall -pedantic -Werror
+CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -g -Wall -pedantic -Werror -D $(GRAPHICS)
 
 _OBJECT_FILES = main.o common.o graphics/pixelsurface.o graphics/renderer.o math/vec2.o graphics/texture.o
+
+LIBS = `sdl2-config --cflags --libs` -lSDL2 
+
+ifeq ($(GRAPHICS), SDL_SIM)
+	_OBJECT_FILES += sdl_window.o
+endif
+
+ifeq ($(GRAPHICS), NCURSES_SIM)
+	LIBS = -lncurses
+	_OBJECT_FILES += ncurses_window.o
+endif
+
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
 IMAGES := $(shell find $(IMAGES_DIRECTORY) -name '*.bmp')
 IMAGES_OBJECT_FILES := $(subst .bmp,.o, $(IMAGES))
 IMAGES_C_FILES := $(subst .bmp,.c, $(IMAGES))
 
-LIBS = `sdl2-config --cflags --libs` -lSDL2 
 
 
 all: main
