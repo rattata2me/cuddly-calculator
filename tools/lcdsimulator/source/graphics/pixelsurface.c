@@ -98,6 +98,20 @@ void g_draw_surface(G_Surface * canvas, G_Surface * draw, vec2 pos){
 
 }
 
+void g_draw_alpha_over(G_Surface * canvas, G_Surface * draw, vec2 pos, char mask){
+	
+	for(int y = 0; y < draw->height; y++){
+		for(int x = 0; x < draw->width; x++){
+			int p = g_get_pixel(draw, x, y);
+			mask = mask > 0 ? 1U : 0U;
+			if(mask == p){
+				g_set_pixel(canvas, x+pos.x, y+pos.y, p);	
+			}
+		}
+	}
+
+}
+
 void g_clear(G_Surface * surface){
 
 	memset(surface->pixels, 0, (G_MEMORY_UNIT/8)*surface->striplen*surface->height);

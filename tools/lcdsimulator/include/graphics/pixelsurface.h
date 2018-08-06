@@ -27,6 +27,8 @@ int g_get_pixel(G_Surface * surface, int x, int y);
 
 void g_draw_surface(G_Surface * canvas, G_Surface * draw, vec2 pos);
 
+void g_draw_alpha_over(G_Surface * canvas, G_Surface * draw, vec2 pos, char mask);
+
 void g_clear(G_Surface * surface);
 
 #endif

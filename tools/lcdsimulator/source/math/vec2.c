@@ -6,8 +6,8 @@ vec2 vec2_create(int x, int y){
 }
 
 vec2 vec2_add(vec2 point, int x, int y){
-	point.x = point.x + x; point.y = point.y + y;
-	return point;
+	vec2 point2 = {point.x + x, point.y + y};
+	return point2;
 }
 
 vec2 vec2_sum(vec2 point1, vec2 point2){

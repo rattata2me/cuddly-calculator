@@ -4,7 +4,8 @@
 #include "graphics/renderer.h"
 #include "graphics/texture.h"
 #include "logo.h"
-
+#include "fonts/arial.h"
+#include "graphics/font.h"
 
 #ifdef SDL_SIM
 	#include "sdl_window.h"
@@ -21,8 +22,8 @@ bool running = false;
 	sdl_window * window;
 #endif
 
-G_Surface * buffer, * texture;
-
+G_Surface * buffer, * texture, * a, * b, * c;
+G_Font * font;
 
 // Test values, just for fun, TODO: create a drawing library.
 int esh = 64;
@@ -46,8 +47,10 @@ int init(){
 
 	buffer = g_create_surface(128, 64);
 	texture = g_create_surface_from_pixels(logo_width, logo_height, logo_pixels);
-
-
+	a = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[0]);
+	b = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[1]);
+	c = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[2]);
+	font = g_create_font_from_data(arial_width, arial_height, arial_indices, arial_pixels[0], arial_size);
 	return 0;
 }
 
@@ -57,8 +60,10 @@ void render(){
 
 	g_clear(buffer);
 
-	
-	g_draw_surface(buffer, texture, vec2_create(-1,-5));
+	g_draw_text(buffer, font, "holAC MunD0", 11, vec2_create(10, 10));
+	//g_draw_surface(buffer, b, vec2_create(5+16, 10));
+	//g_draw_surface(buffer, c, vec2_create(16*2, 10));
+	//g_draw_surface(buffer, texture, vec2_create(-1,-5));
 	//g_draw_rect(buffer, vec2_create(k/10,1), vec2_create(10,10), 1);
 	//g_draw_rect(buffer, vec2_create(100-k/5,20), vec2_create(10,10), 1);
 	//g_fill_shape(buffer, vec2_create(12, 13), 1U);
@@ -105,3 +110,4 @@ int main(int argc, char* args[]){
 
 	return 0;
 }
+

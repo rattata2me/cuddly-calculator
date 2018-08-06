@@ -56,7 +56,7 @@ def convert_image(image_file, var_name):
 	final_str += "\n" + "unsigned int " + var_name + "_width = " + str(int(size[0])) + ";"
 	final_str += "\n" + "unsigned int " + var_name + "_height = " + str(int(size[1])) + ";"
 	output_file = open(var_name_file+".c", "w")
-	output_file.write(final_str)
+	output_file.write(final_str+"\n")
 	output_file.close()
 
 	header_str = "" \
@@ -81,14 +81,12 @@ def convert_font(image_folder, var_name):
 	var_name_file = var_name
 	var_name = (var_name.split("/"))[-1]
 
-	upper_str = "" \
-	"// Auto-generated .C Image file " + str(VERSION) + "\n" \
-	"\nunsigned char"
-	upper_str = upper_str + " " + var_name + "_pixels[][] = {\n"
+	upper_str = ""
 
 	indices = []
 
 	size = [0,0]
+        sx = 0
 	g = 0
 	for image_file in image_files:
 		indices.append(image_file[0])
@@ -118,7 +116,16 @@ def convert_font(image_folder, var_name):
 		g += 1
 
 	upper_str = upper_str[:-1]
-	upper_str += "\n}\n\nchar " + var_name + "_indices[] = {\n"
+        bin_str = upper_str
+        upper_str = "" \
+        "// Auto-generated .C Image file " + str(VERSION) + "\n" \
+        "\nunsigned char"
+        upper_str = upper_str + " " + var_name + "_pixels[][" + str(sx*size[1]) + "] = {\n"
+	
+        upper_str += bin_str
+
+        upper_str += "\n};\n\nchar " + var_name + "_indices[] = {\n"
+
 	c = 0
 	for i in indices:
 		if c == 0:
@@ -132,21 +139,23 @@ def convert_font(image_folder, var_name):
 	upper_str += "\n}"
 	upper_str += "\n\n" + "unsigned int " + var_name + "_width = " + str(int(size[0])) + ";"
 	upper_str += "\n" + "unsigned int " + var_name + "_height = " + str(int(size[1])) + ";"
+        upper_str += "\n" + "unsigned int " + var_name + "_size = " + str(g) + ";"
 
 	header_str = "" \
 	"// Auto-generated Header Image file " + str(VERSION) + "\n" \
 	"#ifndef CCALCLC_SRC_FONTS_" + var_name + "_H_\n" \
 	"#define CCALCLC_SRC_FONTS_" + var_name + "_H_\n" \
-	"extern unsigned char " + var_name + "_pixels[][" + str(g) + "];\n" \
+	"extern unsigned char " + var_name + "_pixels["+str(g)+"][" + str(sx) + "];\n" \
 	"extern unsigned int " + var_name + "_width;\n" \
 	"extern unsigned int " + var_name + "_height;\n" \
+        "extern unsigned int " + var_name + "_size;\n" \
 	"#endif\n"
 	output_file = open(var_name_file+".h", "w")
 	output_file.write(header_str)
 	output_file.close()
 
 	output_file = open(var_name_file+".c", "w")
-	output_file.write(upper_str)
+        output_file.write(upper_str + "\n")
 	output_file.close()
 
 chr_map = open('ASCII.txt', 'r').read()
@@ -175,7 +184,6 @@ def generatefont_external(font_name):
 
 
 sys.argv.pop(0)
-
 if len(sys.argv) > 0:	
 	if sys.argv[0] == "image":
 		if len(sys.argv) == 3:
@@ -191,6 +199,7 @@ if len(sys.argv) > 0:
 			convert_font(sys.argv[1], var_name)
 
 	if sys.argv[0] == "gen-font":
+		print("efec")
 		if len(sys.argv) == 4:
-			generatefont_internal(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+		    generatefont_internal(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
