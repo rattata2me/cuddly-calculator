@@ -6,6 +6,8 @@
 #include "logo.h"
 #include "fonts/arial.h"
 #include "graphics/font.h"
+#include "bigfont.h"
+#include "smallfont.h"
 
 #ifdef SDL_SIM
 	#include "sdl_window.h"
@@ -22,10 +24,10 @@ bool running = false;
 	sdl_window * window;
 #endif
 
-G_Surface * buffer, * texture, * a, * b, * c;
-G_Font * font;
+G_Surface * buffer, * texture, * s, * b, * c;
 
-// Test values, just for fun, TODO: create a drawing library.
+
+// Test values, just for fun
 int esh = 64;
 int esw = 128;
 
@@ -47,10 +49,8 @@ int init(){
 
 	buffer = g_create_surface(128, 64);
 	texture = g_create_surface_from_pixels(logo_width, logo_height, logo_pixels);
-	a = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[0]);
-	b = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[1]);
-	c = g_create_surface_from_pixels(arial_width, arial_height, arial_pixels[2]);
-	font = g_create_font_from_data(arial_width, arial_height, arial_indices, arial_pixels[0], arial_size);
+	b = g_create_surface_from_pixels(bigfont_width, bigfont_height, bigfont_pixels);
+	s = g_create_surface_from_pixels(smallfont_width, smallfont_height, smallfont_pixels);
 	return 0;
 }
 
@@ -59,8 +59,11 @@ void render(){
 
 
 	g_clear(buffer);
-
-	g_draw_text(buffer, font, "holAC MunD0", 11, vec2_create(10, 10));
+	g_draw_text(buffer, b, "1. Big Font", vec2_create(1,10), vec2_create(bigfont_width/FONT_SIZE,
+				bigfont_height/FONT_SIZE));
+	g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40), vec2_create(smallfont_width/FONT_SIZE,
+				smallfont_height/FONT_SIZE));
+	//g_draw_text(buffer, font, "holAC MunD0", 11, vec2_create(10, 10));
 	//g_draw_surface(buffer, b, vec2_create(5+16, 10));
 	//g_draw_surface(buffer, c, vec2_create(16*2, 10));
 	//g_draw_surface(buffer, texture, vec2_create(-1,-5));
