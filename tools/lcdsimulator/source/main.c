@@ -4,7 +4,6 @@
 #include "graphics/renderer.h"
 #include "graphics/texture.h"
 #include "logo.h"
-#include "fonts/arial.h"
 #include "graphics/font.h"
 #include "bigfont.h"
 #include "smallfont.h"
