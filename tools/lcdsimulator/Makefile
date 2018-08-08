@@ -41,7 +41,7 @@ makebuild:
 	@mkdir -p build
 
 library:
-	cd $(LIBRARY_DIRECTORY) && cd .. && make all
+	cd $(LIBRARY_DIRECTORY)/.. && make all
 
 $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild library
 	$(CC) -c -o $@ $< $(CFLAGS)
