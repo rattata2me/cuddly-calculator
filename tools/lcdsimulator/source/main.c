@@ -58,10 +58,8 @@ void render(){
 
 
 	g_clear(buffer);
-	g_draw_text(buffer, b, "1. Big Font", vec2_create(1,10), vec2_create(bigfont_width/FONT_SIZE,
-				bigfont_height/FONT_SIZE));
-	g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40), vec2_create(smallfont_width/FONT_SIZE,
-				smallfont_height/FONT_SIZE));
+	g_draw_text(buffer, b, "1. Big Font", vec2_create(1,10));
+	g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40));
 	//g_draw_text(buffer, font, "holAC MunD0", 11, vec2_create(10, 10));
 	//g_draw_surface(buffer, b, vec2_create(5+16, 10));
 	//g_draw_surface(buffer, c, vec2_create(16*2, 10));
