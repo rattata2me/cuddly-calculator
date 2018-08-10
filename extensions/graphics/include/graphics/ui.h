@@ -15,8 +15,35 @@ typedef struct{
 	char autoscroll;
 } G_ScrollText;
 
-G_ScrollText * create_scrolltext(G_Surface * font, char autoscroll, Rect rect);
+typedef struct{
+
+	char is_pressed;
+	G_Surface * up;
+	G_Surface * down;
+	Rect rect;
+
+} G_ImageButton;
+
+typedef struct{
+
+	char is_pressed;
+	G_Surface * font;
+	char * text;
+	Rect rect;
+
+} G_TextButton;
+
+G_ScrollText * g_create_scrolltext(G_Surface * font, char autoscroll, Rect rect);
 
 void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext);
 
+void g_destroy_scrolltext(G_ScrollText * scrolltext);
+
+G_ImageButton * g_create_imagebutton(G_Surface * up, G_Surface * down, vec2 pos);
+
+void g_draw_imagebutton(G_Surface * buffer, G_ImageButton * imagebutton);
+
+//G_TextButton * g_create_textbutton(G_Surfac);
+
 #endif
+

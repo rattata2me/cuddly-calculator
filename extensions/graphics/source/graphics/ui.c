@@ -1,6 +1,6 @@
 #include "graphics/ui.h"
 
-G_ScrollText * create_scrolltext(G_Surface * font, char autoscroll, Rect rect){
+G_ScrollText * g_create_scrolltext(G_Surface * font, char autoscroll, Rect rect){
 	G_ScrollText * scrolltext = malloc(sizeof(G_ScrollText));
 	scrolltext->font = font;
 	scrolltext->rect = rect;
@@ -48,6 +48,33 @@ void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
 			line++;
 		}
 		j++;
+	}
+
+}
+
+void g_destroy_scrolltext(G_ScrollText * scrolltext){
+	g_destroy_surface(scrolltext->font);
+	free(scrolltext);
+}
+
+
+G_ImageButton * g_create_imagebutton(G_Surface * up, G_Surface * down, vec2 pos){
+
+	G_ImageButton * imagebutton = malloc(sizeof(G_ImageButton));
+	imagebutton->is_pressed = 0;
+	imagebutton->up = up;
+	imagebutton->down = down;
+	imagebutton->rect = rect_create(pos.x, pos.y, up->width, up->height);
+	return imagebutton;
+	
+}
+
+void g_draw_imagebutton(G_Surface * buffer, G_ImageButton * imagebutton){
+	
+	if(imagebutton->is_pressed){
+		g_draw_surface(buffer, imagebutton->down, vec2_create(imagebutton->rect.x, imagebutton->rect.y));
+	}else{
+		g_draw_surface(buffer, imagebutton->up, vec2_create(imagebutton->rect.x, imagebutton->rect.y));
 	}
 
 }

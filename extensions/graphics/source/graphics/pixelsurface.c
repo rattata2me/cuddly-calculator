@@ -112,6 +112,30 @@ void g_draw_alpha_over(G_Surface * canvas, G_Surface * draw, vec2 pos, char mask
 
 }
 
+void g_invert_surface(G_Surface * surface, Rect rect){
+	
+	int xs = G_MEMORY_UNIT - (rect.x%G_MEMORY_UNIT);
+	int xf = (rect.x+rect.width)%G_MEMORY_UNIT;
+	for(int y = rect.y; y < rect.y+rect.height; y++){
+		for(int x = rect.x; x < rect.x+xs; x++){
+			if(x < rect.x+rect.width){ 
+				g_set_pixel(surface, x, y, !g_get_pixel(surface, x, y));
+			}
+		}
+		int txs = rect.x+xs;
+		while(txs+G_MEMORY_UNIT <= rect.x+rect.width && txs+G_MEMORY_UNIT <= surface->width){
+			surface->pixels[txs/G_MEMORY_UNIT+y*surface->striplen] = 
+				~surface->pixels[txs/G_MEMORY_UNIT+y*surface->striplen];
+			txs = txs+G_MEMORY_UNIT;
+		}
+		for(int x = txs; x < txs+xf; x++){
+			if(x < rect.x+rect.width) g_set_pixel(surface, x, y,
+					!g_get_pixel(surface, x, y));
+		}
+	}
+
+}
+
 void g_clear(G_Surface * surface){
 
 	memset(surface->pixels, 0, (G_MEMORY_UNIT/8)*surface->striplen*surface->height);

@@ -52,9 +52,9 @@ int init(){
 	texture = g_create_surface_from_pixels(logo_width, logo_height, logo_pixels);
 	b = g_create_surface_from_pixels(bigfont_width, bigfont_height, bigfont_pixels);
 	s = g_create_surface_from_pixels(smallfont_width, smallfont_height, smallfont_pixels);
-	scrolltext = create_scrolltext(s, 1, rect_create(5, 20, 120, 40));
+	scrolltext = g_create_scrolltext(s, 1, rect_create(5, 20, 120, 40));
 	scrolltext->text = "The free and open source calculator\n        v0.01";
-	cuddly = create_scrolltext(b, 1, rect_create(25, 1, 80, 20));
+	cuddly = g_create_scrolltext(b, 1, rect_create(25, 1, 80, 20));
 	cuddly->text = "Cuddly-Calculator";
 	return 0;
 }
@@ -67,6 +67,7 @@ void render(){
 	//g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40));
 	g_draw_scrolltext(buffer, scrolltext);
 	g_draw_scrolltext(buffer, cuddly);
+	g_invert_surface(buffer, rect_create(k/20, 1, 70, 40));
 	//g_draw_surface(buffer, b, vec2_create(5+16, 10));
 	//g_draw_surface(buffer, c, vec2_create(16*2, 10));
 	//g_draw_surface(buffer, texture, vec2_create(-1,-5));
