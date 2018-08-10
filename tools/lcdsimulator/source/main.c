@@ -7,6 +7,7 @@
 #include "graphics/font.h"
 #include "bigfont.h"
 #include "smallfont.h"
+#include "graphics/ui.h"
 
 #ifdef SDL_SIM
 	#include "sdl_window.h"
@@ -23,8 +24,9 @@ bool running = false;
 	sdl_window * window;
 #endif
 
-G_Surface * buffer, * texture, * s, * b, * c;
+G_Surface * buffer, * texture, * s, * b;
 
+G_ScrollText * scrolltext, * cuddly;
 
 // Test values, just for fun
 int esh = 64;
@@ -50,17 +52,21 @@ int init(){
 	texture = g_create_surface_from_pixels(logo_width, logo_height, logo_pixels);
 	b = g_create_surface_from_pixels(bigfont_width, bigfont_height, bigfont_pixels);
 	s = g_create_surface_from_pixels(smallfont_width, smallfont_height, smallfont_pixels);
+	scrolltext = create_scrolltext(s, 1, rect_create(5, 20, 120, 40));
+	scrolltext->text = "The free and open source calculator\n        v0.01";
+	cuddly = create_scrolltext(b, 1, rect_create(25, 1, 80, 20));
+	cuddly->text = "Cuddly-Calculator";
 	return 0;
 }
 
 int k = 0;
 void render(){
 
-
 	g_clear(buffer);
-	g_draw_text(buffer, b, "1. Big Font", vec2_create(1,10));
-	g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40));
-	//g_draw_text(buffer, font, "holAC MunD0", 11, vec2_create(10, 10));
+	//g_draw_text(buffer, b, "1. Big Font", vec2_create(1,10));
+	//g_draw_text(buffer, s, "2. Small Font", vec2_create(2, 40));
+	g_draw_scrolltext(buffer, scrolltext);
+	g_draw_scrolltext(buffer, cuddly);
 	//g_draw_surface(buffer, b, vec2_create(5+16, 10));
 	//g_draw_surface(buffer, c, vec2_create(16*2, 10));
 	//g_draw_surface(buffer, texture, vec2_create(-1,-5));

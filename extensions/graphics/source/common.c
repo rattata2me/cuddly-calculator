@@ -8,3 +8,9 @@ const unsigned int CCALCLCDSIM_VERSION_NUMBER = ((CCALCLCDSIM_MAJOR_VERSION & 0x
 int sign(int x){
     return (x > 0 ? 1 : -1);
 }
+
+int str_len(char * str){
+	int i = 0;
+	while(str[i] != '\0') i++;
+	return i;
+}

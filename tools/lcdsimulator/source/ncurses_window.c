@@ -1,5 +1,5 @@
 #include "ncurses_window.h"
-
+#include "unistd.h"
 
 #define BLACK       1
 #define WHITE  2
@@ -37,6 +37,7 @@ void ncurses_loop(G_Surface * buffer){
 		}
 		printw("\n");
 	}
-	refresh();	
+	refresh();
+	usleep(20000);
 }
 

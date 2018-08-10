@@ -8,7 +8,7 @@ typedef struct{
 	int height;
 } Rect;
 
-Rect create_rect(int x, int y, int width, int height);
+Rect rect_create(int x, int y, int width, int height);
 
 #endif
 

@@ -17,5 +17,6 @@ extern const unsigned int CCALCLCDSIM_VERSION_NUMBER;
 
 int sign(int x);
 
+int str_len(char * str);
 
 #endif

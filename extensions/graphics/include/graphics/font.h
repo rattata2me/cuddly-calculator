@@ -8,5 +8,7 @@ extern unsigned char FONT_SIZE;
 void g_draw_text(G_Surface * canvas, G_Surface * bitmap,
 		char * text, vec2 pos);
 
+void g_draw_word(G_Surface * canvas, G_Surface * bitmap, char letter, vec2 pos);
+
 #endif
 
