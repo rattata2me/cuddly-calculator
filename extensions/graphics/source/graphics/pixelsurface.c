@@ -13,7 +13,7 @@ G_Surface * g_create_surface(unsigned int width, unsigned int height){
 
 	// Buffer allocation
 	surface = malloc(sizeof(G_Surface));
-	surface->width = width;
+	surface->width = width+1;
 	surface->striplen = nrow;
 	surface->height = height;
 	surface->pixels = (unsigned char *) calloc(nrow*height, (G_MEMORY_UNIT/8));

@@ -5,7 +5,7 @@ G_ScrollText * g_create_scrolltext(G_Surface * font, char autoscroll, Rect rect)
 	scrolltext->font = font;
 	scrolltext->rect = rect;
 	scrolltext->autoscroll = autoscroll;
-	scrolltext->text = "\0";
+	scrolltext->text = str_new("");
 	scrolltext->sx = 0;
 	scrolltext->sy = 0;
 	return scrolltext;
@@ -54,6 +54,7 @@ void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
 
 void g_destroy_scrolltext(G_ScrollText * scrolltext){
 	g_destroy_surface(scrolltext->font);
+	free(scrolltext->text);
 	free(scrolltext);
 }
 
@@ -91,7 +92,7 @@ G_TextButton * g_create_textbutton(G_Surface * font, Rect rect){
 	textbutton->font = font;
 	textbutton->rect = rect;
 	textbutton->is_pressed = 0;
-	textbutton->text = "";
+	textbutton->text = str_new("");
 	return textbutton;
 
 }
@@ -106,3 +107,10 @@ void g_draw_textbutton(G_Surface * surface, G_TextButton * textbutton){
 	g_draw_rect(surface, textbutton->rect, 1);
 	if(textbutton->is_pressed) g_invert_surface(surface, textbutton->rect);
 }
+
+void g_destroy_textbutton(G_TextButton * textbutton){
+	free(textbutton->text);
+	g_destroy_surface(textbutton->font);
+	free(textbutton);
+}
+

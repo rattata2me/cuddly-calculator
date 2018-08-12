@@ -84,6 +84,7 @@ SDL_Event e;
 bool sdl_loop(sdl_window * window, G_Scene * scene){
 
 	bool running = true;
+	SDL_StartTextInput();
 	while(SDL_PollEvent(&e) != 0){
 			switch(e.type){
 				
@@ -91,8 +92,31 @@ bool sdl_loop(sdl_window * window, G_Scene * scene){
 					running = false;
 					break;
 				
-				case SDL_KEYDOWN:
-					input_set_key(scene->input_buffer, e.key.keysym.sym, 1);
+				case SDL_TEXTINPUT:
+					printf("%c \n", e.text.text[0]);
+					input_set_key(scene->input_buffer, e.text.text[0], 1);
+					break;
+				case SDL_KEYDOWN:;
+					int key = e.key.keysym.sym;
+					int t = 0;
+					switch (key){
+						case SDLK_RETURN:
+							t = key;
+							break;
+						case SDLK_UP:
+							t = 220;
+							break;
+						case SDLK_DOWN:
+							t = 221;
+							break;
+						case SDLK_LEFT:
+							t = 222;
+							break;
+						case SDLK_RIGHT:
+							t = 223;
+							break;
+					}
+					if(t != 0){ input_set_key(scene->input_buffer, t, 1); printf("%i \n", t);}
 					break;
 			}
 		}

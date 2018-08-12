@@ -19,4 +19,10 @@ int sign(int x);
 
 int str_len(char * str);
 
+char * str_new(char * str);
+
+char * str_concat(char * a, char * b);
+
+char * str_append(char * a, unsigned char b);
+
 #endif
