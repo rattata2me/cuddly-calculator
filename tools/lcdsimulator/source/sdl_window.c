@@ -43,16 +43,17 @@ sdl_window * sdl_init_window(){
 		printf("Is this a computer or a toaster?, mmm, ERROR: %s\n", SDL_GetError());	
 		return NULL;
 	}
+
 	return window;
 }
 
-void sdl_render(sdl_window * window, G_Surface * buffer){
+void sdl_render(sdl_window * window, G_Scene * scene){
 
 	sdl_clear(window, 0x22, 0x22, 0x22, 0xff);
 
-	for(int y = 0; y < buffer->height; y++){
-		for(int x = 0; x < buffer->width; x++){
-			int e = g_get_pixel(buffer, x, y);
+	for(int y = 0; y < scene->buffer->height; y++){
+		for(int x = 0; x < scene->buffer->width; x++){
+			int e = g_get_pixel(scene->buffer, x, y);
 
 			if(e == 0){
 				SDL_SetRenderDrawColor(window->renderer, 0x00, 0x3F, 0x00, 0xFF);
@@ -80,17 +81,23 @@ void sdl_quit(sdl_window * window){
 
 SDL_Event e;
 
-bool sdl_loop(sdl_window * window, G_Surface * buffer){
+bool sdl_loop(sdl_window * window, G_Scene * scene){
 
 	bool running = true;
 	while(SDL_PollEvent(&e) != 0){
-			if(e.type == SDL_QUIT){
-				running = false;
+			switch(e.type){
 				
+				case SDL_QUIT:
+					running = false;
+					break;
+				
+				case SDL_KEYDOWN:
+					input_set_key(scene->input_buffer, e.key.keysym.sym, 1);
+					break;
 			}
 		}
 
-	sdl_render(window, buffer);
+	sdl_render(window, scene);
 	return running;
 
 }

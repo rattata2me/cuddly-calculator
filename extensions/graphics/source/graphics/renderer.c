@@ -30,27 +30,42 @@ void g_draw_line(G_Surface * surface, vec2 origin, vec2 end, int color){
 
 // Crappy function TODO Fix this maybe?
 
-void g_draw_rect(G_Surface * surface, vec2 origin, vec2 size, int color){
+void g_draw_rect(G_Surface * surface, Rect rect, int color){
 
-	vec2 xvec = origin;
-	xvec.x = xvec.x + size.x;
-	vec2 yvec = origin;
-	yvec.y = yvec.y + size.y;
-	vec2 sumvec = vec2_sum(origin, size);
+	rect.height += -1;
+	rect.width += -1;
+	vec2 xvec = rect_pos(rect);
+	xvec.x = xvec.x + rect.width;
+	vec2 yvec = rect_pos(rect);
+	yvec.y = yvec.y + rect.height;
+	vec2 sumvec = vec2_sum(rect_pos(rect), rect_size(rect));
 
-	g_draw_line(surface, origin, yvec, color);
-	g_draw_line(surface, origin, xvec, color);
+	g_draw_line(surface, rect_pos(rect), yvec, color);
+	g_draw_line(surface, rect_pos(rect), xvec, color);
 	g_draw_line(surface, xvec, sumvec, color);
 	g_draw_line(surface, yvec, sumvec, color);
 
 }
 
-void g_fill_rect(G_Surface * surface, vec2 origin, vec2 size, int color){
+void g_fill_rect(G_Surface * surface, Rect rect, int color){
 
-	for(int x = 0; x < size.x; x++){
-		for(int y = 0; y < size.y; y++){
-			vec2 t = vec2_add(origin, x, y);
-			g_set_pixel(surface, t.x, t.y, color);
+	int xs = G_MEMORY_UNIT - (rect.x%G_MEMORY_UNIT);
+	int xf = (rect.x+rect.width)%G_MEMORY_UNIT;
+	unsigned char col = color > 0 ? ~0 : 0;
+	for(int y = rect.y; y < rect.y+rect.height && y < (int)surface->height; y++){
+		for(int x = rect.x; x < rect.x+xs; x++){
+			if(x < rect.x+rect.width){
+				g_set_pixel(surface, x, y, color);
+			}
+		}
+		int txs = rect.x+xs;
+		while(txs+G_MEMORY_UNIT <= rect.x+rect.width && txs+G_MEMORY_UNIT <= surface->width){
+			if(txs >= 0 && y >= 0) surface->pixels[(txs/G_MEMORY_UNIT)+y*surface->striplen] = col;
+			txs = txs+G_MEMORY_UNIT;
+		}
+		for(int x = txs; x < txs+xf; x++){
+			if(x < rect.x+rect.width) g_set_pixel(surface, x, y,
+					color);
 		}
 	}
 

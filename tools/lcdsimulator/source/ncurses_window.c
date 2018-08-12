@@ -14,13 +14,13 @@ void ncurses_init(){
 }
 
 
-void ncurses_loop(G_Surface * buffer){
+void ncurses_loop(G_Scene * scene){
 	int cBlock = 0x20;
 	erase();
-	for(int y = 0; y < buffer->height+2; y++){
-		for(int x = 0; x < buffer->width+2; x++){
-			int e = g_get_pixel(buffer, x-1, y-1);
-			if(x == 0 || y == 0 || x == buffer->width+1 || y == buffer->height+1){
+	for(int y = 0; y < scene->buffer->height+2; y++){
+		for(int x = 0; x < scene->buffer->width+2; x++){
+			int e = g_get_pixel(scene->buffer, x-1, y-1);
+			if(x == 0 || y == 0 || x == scene->buffer->width+1 || y == scene->buffer->height+1){
 				addch(98);
 				if(!(x % 3 == 0)) addch(98);
 			}else{
@@ -41,3 +41,8 @@ void ncurses_loop(G_Surface * buffer){
 	usleep(20000);
 }
 
+void ncurses_input(G_Scene * scene){
+	nodelay(stdscr, TRUE);
+	int val = getch();
+	if(val != ERR) input_set_key(scene->input_buffer, val, 1);
+}

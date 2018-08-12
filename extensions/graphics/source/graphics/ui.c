@@ -78,3 +78,31 @@ void g_draw_imagebutton(G_Surface * buffer, G_ImageButton * imagebutton){
 	}
 
 }
+
+void g_destroy_imagebutton(G_ImageButton * imagebutton){
+	g_destroy_surface(imagebutton->up);
+	g_destroy_surface(imagebutton->down);
+	free(imagebutton);
+}
+
+G_TextButton * g_create_textbutton(G_Surface * font, Rect rect){
+	
+	G_TextButton * textbutton = malloc(sizeof(G_TextButton));
+	textbutton->font = font;
+	textbutton->rect = rect;
+	textbutton->is_pressed = 0;
+	textbutton->text = "";
+	return textbutton;
+
+}
+
+void g_draw_textbutton(G_Surface * surface, G_TextButton * textbutton){
+	int len = str_len(textbutton->text);
+	vec2 size = g_font_size(textbutton->font);
+	vec2 startpoint = vec2_minus(rect_middle(textbutton->rect), 
+			vec2_create(size.x*len/2, size.y/2));
+	g_fill_rect(surface, textbutton->rect, 0);
+	g_draw_text(surface, textbutton->font, textbutton->text, startpoint);
+	g_draw_rect(surface, textbutton->rect, 1);
+	if(textbutton->is_pressed) g_invert_surface(surface, textbutton->rect);
+}

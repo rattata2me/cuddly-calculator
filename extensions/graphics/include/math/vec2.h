@@ -16,6 +16,10 @@ vec2 vec2_minus(vec2 point1, vec2 point2);
 
 vec2 vec2_abs(vec2 point);
 
+vec2 vec2_mul(vec2 point, int factor);
+
+vec2 vec2_div(vec2 point, int factor);
+
 vec2 vec2_create(int x, int y);
 
 bool vec2_equal(vec2 point1, vec2 point2);

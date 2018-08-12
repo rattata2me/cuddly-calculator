@@ -7,6 +7,7 @@ G_Surface * g_create_surface(unsigned int width, unsigned int height){
 
 	G_Surface * surface;
 
+	width += -1;
 	// Divide the pixel array in int groups. One pixel = one bit, so there are sizeof(int) pixels in each group.
 	int nrow = (width+(G_MEMORY_UNIT - (width % G_MEMORY_UNIT)))/G_MEMORY_UNIT;
 
@@ -30,7 +31,7 @@ void g_destroy_surface(G_Surface * surface){
 void g_set_pixel(G_Surface * surface, int x, int y, int val){
 
 	// Box limitation to prevent overflow.
-	if(((x < 0) | (x > surface->width)) | ((y < 0) | (y > surface->height))) return;
+	if(((x < 0) | (x >= surface->width)) | ((y < 0) | (y >= surface->height))) return;
 
 	//Relative x position in the memory block
 	int rest = x%G_MEMORY_UNIT;
@@ -61,7 +62,7 @@ void g_set_pixel(G_Surface * surface, int x, int y, int val){
 int g_get_pixel(G_Surface * surface, int x, int y){
 
 	// Box limitation to prevent overflow.
-	if(((x < 0) | (x > surface->width)) | ((y < 0) | (y > surface->height))) return 0;
+	if(((x < 0) | (x >= surface->width)) | ((y < 0) | (y >= surface->height))) return 0;
 
 	//Relative x position in the memory block
 	int rest = x%G_MEMORY_UNIT;
@@ -116,7 +117,7 @@ void g_invert_surface(G_Surface * surface, Rect rect){
 	
 	int xs = G_MEMORY_UNIT - (rect.x%G_MEMORY_UNIT);
 	int xf = (rect.x+rect.width)%G_MEMORY_UNIT;
-	for(int y = rect.y; y < rect.y+rect.height; y++){
+	for(int y = rect.y; (y < rect.y+rect.height && y < (int)surface->height); y++){
 		for(int x = rect.x; x < rect.x+xs; x++){
 			if(x < rect.x+rect.width){ 
 				g_set_pixel(surface, x, y, !g_get_pixel(surface, x, y));
@@ -124,7 +125,7 @@ void g_invert_surface(G_Surface * surface, Rect rect){
 		}
 		int txs = rect.x+xs;
 		while(txs+G_MEMORY_UNIT <= rect.x+rect.width && txs+G_MEMORY_UNIT <= surface->width){
-			surface->pixels[txs/G_MEMORY_UNIT+y*surface->striplen] = 
+			if(txs >= 0 && y >= 0) surface->pixels[txs/G_MEMORY_UNIT+y*surface->striplen] = 
 				~surface->pixels[txs/G_MEMORY_UNIT+y*surface->striplen];
 			txs = txs+G_MEMORY_UNIT;
 		}

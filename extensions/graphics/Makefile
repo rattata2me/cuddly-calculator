@@ -10,8 +10,8 @@ BUILD_DIRECTORY = build
 
 CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -g -Wall -Werror -pedantic
 
-_OBJECT_FILES = common.o graphics/pixelsurface.o graphics/renderer.o math/vec2.o graphics/texture.o graphics/font.o
-_OBJECT_FILES += math/rect.o graphics/ui.o
+_OBJECT_FILES = common.o graphics/pixelsurface.o graphics/renderer.o input.o math/vec2.o graphics/texture.o graphics/font.o
+_OBJECT_FILES += math/rect.o graphics/ui.o programs/calc.o
 
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
@@ -27,6 +27,7 @@ makebuild:
 	@mkdir -p build
 	@mkdir -p build/graphics
 	@mkdir -p build/math
+	@mkdir -p build/programs
 
 LIB_NAME = libcalcg.a
 

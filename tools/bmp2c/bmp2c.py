@@ -94,6 +94,7 @@ def convert_font(image_folder, var_name):
 		img = Image.open(image_file)
 		img = img.convert("RGB")
 		size = img.size
+                size[0] -= 1
 		sx = ((size[0] + (BYTE_SIZE - (size[0] % BYTE_SIZE))) / BYTE_SIZE)
 		sy = size[1]
 		binary = []

@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 
 #include "graphics/pixelsurface.h"
+#include "input.h"
+#include "graphics/scene.h"
 
 typedef struct{
 
@@ -16,10 +18,10 @@ void sdl_clear(sdl_window * window, int r, int g, int b, int a);
 
 sdl_window * sdl_init_window();
 
-void sdl_render(sdl_window * window, G_Surface * buffer);
+void sdl_render(sdl_window * window, G_Scene * scene);
 
 void sdl_quit(sdl_window * window);
 
-bool sdl_loop(sdl_window * window, G_Surface * buffer);
+bool sdl_loop(sdl_window * window, G_Scene * scene);
 
 #endif

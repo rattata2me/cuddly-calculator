@@ -11,7 +11,7 @@ void g_draw_text(G_Surface * canvas, G_Surface * bitmap, char * text, vec2 pos){
 }
 
 void g_draw_word(G_Surface * canvas, G_Surface * bitmap, char letter, vec2 pos){
-	vec2 size = {bitmap->width/FONT_SIZE, bitmap->height/FONT_SIZE};
+	vec2 size = g_font_size(bitmap);
 	for(int y = 0; y < size.y; y++){
 		for(int x = 0; x < size.x; x++){
 			int p = g_get_pixel(bitmap, (letter%FONT_SIZE)*size.x + x, y+size.y*(letter/FONT_SIZE));
@@ -20,4 +20,8 @@ void g_draw_word(G_Surface * canvas, G_Surface * bitmap, char letter, vec2 pos){
 			}
 		}
 	}
+}
+
+vec2 g_font_size(G_Surface * font){
+	return vec2_create(font->width/FONT_SIZE, font->height/FONT_SIZE);
 }

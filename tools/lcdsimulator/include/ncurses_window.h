@@ -3,9 +3,13 @@
 
 #include <ncurses.h>
 #include "graphics/pixelsurface.h"
+#include "input.h"
+#include "graphics/scene.h"
 
 void ncurses_init();
 
-void ncurses_loop(G_Surface * buffer);
+void ncurses_loop(G_Scene * scene);
+
+void ncurses_input(G_Scene * scene);
 
 #endif

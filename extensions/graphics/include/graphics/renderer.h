@@ -7,9 +7,9 @@
 
 void g_draw_line(G_Surface * surface, vec2 origin, vec2 end, int color);
 
-void g_draw_rect(G_Surface * surface, vec2 origin, vec2 size, int color);
+void g_draw_rect(G_Surface * surface, Rect rect, int color);
 
-void g_fill_rect(G_Surface * surface, vec2 origin, vec2 size, int color);
+void g_fill_rect(G_Surface * surface, Rect rect, int color);
 
 void g_fill_shape(G_Surface * surface, vec2 point, unsigned int color);
 

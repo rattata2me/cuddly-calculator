@@ -20,6 +20,14 @@ vec2 vec2_minus(vec2 point1, vec2 point2){
 	return result;
 }
 
+vec2 vec2_mul(vec2 point, int factor){
+	return vec2_create(point.x*factor, point.y*factor);
+}
+
+vec2 vec2_div(vec2 point, int factor){
+	return vec2_create(point.x/factor, point.y/factor);
+}
+
 vec2 vec2_abs(vec2 point){
 	point.x = abs(point.x);
 	point.y = abs(point.y);

@@ -10,5 +10,7 @@ void g_draw_text(G_Surface * canvas, G_Surface * bitmap,
 
 void g_draw_word(G_Surface * canvas, G_Surface * bitmap, char letter, vec2 pos);
 
+vec2 g_font_size(G_Surface * font);
+
 #endif
 

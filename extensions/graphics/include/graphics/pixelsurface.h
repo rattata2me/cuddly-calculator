@@ -11,7 +11,7 @@ extern int G_MEMORY_UNIT;
 typedef struct{
 
 	unsigned int width;
-	unsigned int striplen;
+	int striplen;
 	unsigned int height;
 	unsigned char * pixels;
 

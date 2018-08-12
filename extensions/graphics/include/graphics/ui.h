@@ -5,6 +5,7 @@
 #include "math/rect.h"
 #include "graphics/pixelsurface.h"
 #include "graphics/font.h"
+#include "graphics/renderer.h"
 
 typedef struct{
 	int sx;
@@ -43,7 +44,13 @@ G_ImageButton * g_create_imagebutton(G_Surface * up, G_Surface * down, vec2 pos)
 
 void g_draw_imagebutton(G_Surface * buffer, G_ImageButton * imagebutton);
 
-//G_TextButton * g_create_textbutton(G_Surfac);
+void g_destroy_imagebutton(G_ImageButton * imagebutton);
+
+G_TextButton * g_create_textbutton(G_Surface * font, Rect rect);
+
+void g_draw_textbutton(G_Surface * buffer, G_TextButton * textbutton);
+
+void g_destroy_textbutton(G_TextButton * textbutton);
 
 #endif
 
