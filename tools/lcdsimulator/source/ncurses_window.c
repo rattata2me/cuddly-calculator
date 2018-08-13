@@ -50,18 +50,22 @@ void ncurses_input(G_Scene * scene){
 		int comp = val+(val2<<8)+(val3<<8);
 		switch(comp){
 			case 39963: //Up
-				val = 220;
+				val = I_UP;
 				break;
 			case 40219: //Down
-				val = 221;
+				val = I_DOWN;
 				break;
-			case 40731:
-				val = 222;
+			case 40731:  //Right
+				val = I_RIGHT;
 				break;
-			case 40475:
-				val = 223;
+			case 40475: //Left
+				val = I_LEFT;
 				break;
 		}
 	}
+	
+	// REMAP
+	if(val == 10) val = I_ENTER; // NewLine to Enter
+
 	if(val != ERR) input_set_key(scene->input_buffer, val, 1);
 }

@@ -102,14 +102,12 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 				if(functions[j][i-startchar] != str[i]) functions_search_bool[j] = 1;
 			}else functions_search_bool[j] = 1;
 		}
-		printf("%c", *(str+i));
 	}
 	for(int i = 0; i < MI_FUN_SIZE; i++){
 		if(!functions_search_bool[i] && startchar != endchar && 
 			endchar-startchar == functions_size[i]-1) code = i;
 		functions_search_bool[i] = 0;
 	}
-	printf("%i code\n", code);
 	return code;
 }
 
@@ -155,8 +153,6 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 		}
 	}
 	args->size = size;
-
-	printf("Size %i\n", size);
 	
 	Mi_Node ** nodearg = malloc(sizeof(Mi_Node *)*size);
 	int lc = endfun+1;
@@ -166,11 +162,6 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 			Mi_Node * node = mathinterpreter_read(0, str, lc+1, i-1);
 			nodearg[c] = node; 
 			c++;
-			for(int j = lc+1; j < i; j++){
-
-				printf("%c", *(str+j));
-			}
-			printf("\n");
 			lc = i;
 		}
 	}
@@ -230,9 +221,6 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 		}
 		char val = ltype - ntype; // this simplify a lot the logic
 
-		
-		printf("ltype = %c, ntype = %c, val = %i, i = %i\n", ltype, ntype, val, i);
-		
 		if(i!= startchar){
 			
 
@@ -254,27 +242,11 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 				current->op.b = addcurrent;
 				current = addcurrent;
 
-				// Debug
-				printf("Number!! ");
-				for(int j = li; j < i; j++){
-					printf("%c", equation[j]);
-				}
-				printf("\n");
-
 				li = i;
 
-				
-				
 			
 			// Only true when comming from a function to a number sin()_(here)_3
 			}else if(val != 0 || ltype == -1){
-
-				// Debug
-				printf("Function!! ");
-				for(int j = li; j < i; j++){
-					printf("%c", equation[j]);
-				}
-				printf("\n");
 
 				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
 				addcurrent->op.type = MI_MUL;
@@ -284,8 +256,6 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 
 				current->op.b = addcurrent;
 				current = addcurrent;
-
-				
 
 				li = i;
 				
@@ -301,12 +271,14 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 
 	// Debug information START
+#ifdef DEBUG
 	printf("Lvl: %c; Startchar: %i; Endchar: %i; String ", hierarchy[hierarchy_level], startchar, endchar);
 	for(int i = startchar; i <= endchar; i++){
 		printf("%c", equation[i]);
 	}
 	printf("\n");
 	//END
+#endif
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
@@ -319,8 +291,6 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 			return this;
 		}
 
-
-		printf("Error\n");
 		return mathinterpreter_error(MI_ERROR_SYNTAX, "Syntax error");
 	}
 
@@ -375,9 +345,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 				// TODO Create a better method
 				case 0: // Cos
 					if(node->fun.args->size == 1){
-						printf("AAAAAAAH \n");
 						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
-						printf("%f\n", a);
 						return cos(a);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 
@@ -392,25 +360,21 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_PLUS:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Addition a %f + b %f result = %f\n", a, b, a+b);
 			return a+b;
 
 		case MI_MINUS:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Substraction a %f - b %f result = %f\n", a, b, a-b);
 			return a-b;
 
 		case MI_MUL:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Multiplication a %f * b %f result = %f\n", a, b, a*b);
 			return a*b;
 
 		case MI_DIV:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Division a %f/b %f result = %f\n", a, b, a/b);
 			//Division by zero
 			if(b == 0.0f){
 				*error = (mathinterpreter_error(MI_ERROR_DIV_BY_ZERO, 
@@ -422,7 +386,6 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_POW:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			printf("Power a %f ^ b %f result = %f\n", a, b, powf(a, b));
 			return powf(a, b);	
 
 		default:

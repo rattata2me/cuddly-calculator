@@ -52,3 +52,21 @@ char * str_append(char * a, unsigned char b){
 	return result;
 }
 
+char * str_shorten(char * a, int amount){
+	int len = str_len(a);
+	if(len-amount >= 0){	
+		char * result = malloc(sizeof(char)*(len-amount+1));
+		memcpy(result, a, sizeof(char)*(len-amount));
+		result[len-amount] = '\0';
+		free(a);
+		return result;
+	}
+	return a;
+}
+
+unsigned char str_equal(char * a, char * b){
+	int la = str_len(a);
+	int lb = str_len(b);
+	int lm = la < lb ? la : lb; // minimun length
+	return memcmp(a, b, sizeof(char)*lm);
+}

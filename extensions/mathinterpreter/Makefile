@@ -9,14 +9,14 @@ BUILD_DIRECTORY = build
 
 CFLAGS = -I$(INCLUDE_DIRECTORY) -g -Wall -pedantic -Werror
 
-_OBJECT_FILES = main.o mathinterpreter.o
+_OBJECT_FILES = mathinterpreter.o
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
 LIBS = -lm
 
 all: main
 
-
+LIB_NAME = libmi.a
 
 .PHONY: makebuild
 
@@ -28,13 +28,13 @@ $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild
 
 
 main: $(OBJ)
-	$(CC) -o $(BUILD_DIRECTORY)/$@ $^ $(CFLAGS) $(LIBS)
-	@echo Executable successfully compiled!
+	ar rcs $(BUILD_DIRECTORY)/$(LIB_NAME) $^
+	@echo Library successfully compiled!
 
 
 .PHONY: clean
 
 clean:
-	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/main 
+	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/*.a 
 
 

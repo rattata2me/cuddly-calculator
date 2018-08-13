@@ -8,7 +8,11 @@ SOURCE_DIRECTORY = source
 IMAGES_DIRECTORY = images
 BUILD_DIRECTORY = build
 
-CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -g -Wall -Werror -pedantic
+
+MI_LIBRARY = ../mathinterpreter/build
+MI_INCLUDE = ../mathinterpreter/include
+
+CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -I$(MI_INCLUDE) -g -Wall -Werror -pedantic
 
 _OBJECT_FILES = common.o graphics/pixelsurface.o graphics/renderer.o input.o math/vec2.o graphics/texture.o graphics/font.o
 _OBJECT_FILES += math/rect.o graphics/ui.o programs/calc.o
@@ -19,7 +23,7 @@ IMAGES := $(shell find $(IMAGES_DIRECTORY) -name '*.bmp')
 IMAGES_OBJECT_FILES := $(subst .bmp,.o, $(IMAGES))
 IMAGES_C_FILES := $(subst .bmp,.c, $(IMAGES))
 
-all: main
+all: mathinterpreter main
 
 .PHONY: makebuild
 
@@ -30,6 +34,8 @@ makebuild:
 	@mkdir -p build/programs
 
 LIB_NAME = libcalcg.a
+
+LIBS = -L$(MI_LIBRARY) -lmi
 
 # Images auto generation
 
@@ -46,7 +52,10 @@ $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild
 	$(CC) -c -o $@ $< $(CFLAGS)
 	
 
-main: $(IMAGES_OBJECT_FILES) $(OBJ)
+mathinterpreter:
+	cd $(MI_LIBRARY)/.. && make all	
+
+main: $(IMAGES_OBJECT_FILES) $(OBJ) 
 	ar rcs $(BUILD_DIRECTORY)/$(LIB_NAME) $^
 	@echo Library Succesfully compiled!!!
 

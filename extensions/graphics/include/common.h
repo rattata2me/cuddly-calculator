@@ -25,4 +25,7 @@ char * str_concat(char * a, char * b);
 
 char * str_append(char * a, unsigned char b);
 
+char * str_shorten(char * a, int amount);
+
 #endif
+

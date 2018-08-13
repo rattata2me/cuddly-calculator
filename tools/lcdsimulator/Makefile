@@ -27,7 +27,9 @@ ifeq ($(GRAPHICS), NCURSES_SIM)
 	_OBJECT_FILES += ncurses_window.o
 endif
 
-LIBS += -L$(LIBRARY_DIRECTORY) -lcalcg
+MI_LIBRARY = ../../extensions/mathinterpreter/build
+
+LIBS += -L$(LIBRARY_DIRECTORY) -lcalcg -L$(MI_LIBRARY) -lmi -lm
 
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 

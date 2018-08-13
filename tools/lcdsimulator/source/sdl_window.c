@@ -93,30 +93,38 @@ bool sdl_loop(sdl_window * window, G_Scene * scene){
 					break;
 				
 				case SDL_TEXTINPUT:
-					printf("%c \n", e.text.text[0]);
 					input_set_key(scene->input_buffer, e.text.text[0], 1);
 					break;
 				case SDL_KEYDOWN:;
 					int key = e.key.keysym.sym;
 					int t = 0;
 					switch (key){
-						case SDLK_RETURN:
-							t = key;
+						case SDLK_RETURN: // ENTER
+							t = I_ENTER;
+							break;
+						case 8: // DEL Key
+							t = I_DEL;
+							break;
+						case 9: // RETURN (tab)
+							t = I_RETURN;
+							break;
+						case 27: // ESC
+							t = I_MENU;
 							break;
 						case SDLK_UP:
-							t = 220;
+							t = I_UP;
 							break;
 						case SDLK_DOWN:
-							t = 221;
+							t = I_DOWN;
 							break;
 						case SDLK_LEFT:
-							t = 222;
+							t = I_LEFT;
 							break;
 						case SDLK_RIGHT:
-							t = 223;
+							t = I_RIGHT;
 							break;
 					}
-					if(t != 0){ input_set_key(scene->input_buffer, t, 1); printf("%i \n", t);}
+					if(t != 0) input_set_key(scene->input_buffer, t, 1);
 					break;
 			}
 		}
