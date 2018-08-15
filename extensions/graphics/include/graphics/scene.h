@@ -9,6 +9,7 @@ typedef struct
 	void (*draw)(void * scene);
 	void (*clear)(void * scene);
 
+	char need_update;
 	G_Surface * buffer;
 	G_Surface * input_buffer;
 

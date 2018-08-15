@@ -16,14 +16,22 @@ int input_get_key(G_Surface * input_buffer, unsigned char key){
 }
 
 
-char * input_text(G_Surface * input_buffer, char * text){
+char * input_text(G_Surface * input_buffer, char * text, int cursor){
 	for(int i = 0; i < 256; i++){
 		if(input_get_key(input_buffer, i) && i > 31 && i < 127){
-			text = str_append(text, i);
+			char ** tmp =  str_divide(text, cursor);
+
+			tmp[0] = str_append(tmp[0], i);
+			text = str_concat(tmp[0], tmp[1]);
+
 			input_set_key(input_buffer, i, 0);
 		}
 		if(i == I_DEL && input_get_key(input_buffer, i)){
-			text = str_shorten(text, 1);
+			char ** tmp = str_divide(text, cursor);
+
+			tmp[0] = str_shorten(tmp[0], 1);
+			text = str_concat(tmp[0], tmp[1]);
+			
 			input_set_key(input_buffer, i, 0);			
 		}
 	}

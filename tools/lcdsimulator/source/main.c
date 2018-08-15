@@ -56,6 +56,7 @@ int init(){
 
 	buffer = g_create_surface(128, 64);
 
+	program->need_update = 0;
 	program->buffer = buffer;
 
 	(*program->init)(program);

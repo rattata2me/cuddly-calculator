@@ -53,7 +53,6 @@ void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
 }
 
 void g_destroy_scrolltext(G_ScrollText * scrolltext){
-	g_destroy_surface(scrolltext->font);
 	free(scrolltext->text);
 	free(scrolltext);
 }
@@ -81,8 +80,6 @@ void g_draw_imagebutton(G_Surface * buffer, G_ImageButton * imagebutton){
 }
 
 void g_destroy_imagebutton(G_ImageButton * imagebutton){
-	g_destroy_surface(imagebutton->up);
-	g_destroy_surface(imagebutton->down);
 	free(imagebutton);
 }
 
@@ -110,7 +107,6 @@ void g_draw_textbutton(G_Surface * surface, G_TextButton * textbutton){
 
 void g_destroy_textbutton(G_TextButton * textbutton){
 	free(textbutton->text);
-	g_destroy_surface(textbutton->font);
 	free(textbutton);
 }
 

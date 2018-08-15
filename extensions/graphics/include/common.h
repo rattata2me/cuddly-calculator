@@ -27,5 +27,9 @@ char * str_append(char * a, unsigned char b);
 
 char * str_shorten(char * a, int amount);
 
+char ** str_divide(char * a, int cursor);
+
+unsigned char str_equal(char * a, char * b);
+
 #endif
 

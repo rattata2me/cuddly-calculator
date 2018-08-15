@@ -22,8 +22,7 @@ void input_set_key(G_Surface * input_buffer, unsigned char key, char value);
 
 int input_get_key(G_Surface * input_buffer, unsigned char key);
 
-char * input_text(G_Surface * input_buffer, char * str);
+char * input_text(G_Surface * input_buffer, char * str, int cursor);
 
-unsigned char str_equal(char * a, char * b);
 
 #endif

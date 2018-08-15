@@ -70,3 +70,18 @@ unsigned char str_equal(char * a, char * b){
 	int lm = la < lb ? la : lb; // minimun length
 	return memcmp(a, b, sizeof(char)*lm);
 }
+
+char ** str_divide(char * a, int cursor){
+	int len = str_len(a);
+	char ** result = malloc(sizeof(char*)*2);
+	char * r1 = malloc(sizeof(char)*(cursor+1));
+	memcpy(r1, a, cursor);
+	r1[cursor] = '\0';
+	char * r2 = malloc(sizeof(char)*(len-cursor+1));
+	memcpy(r2, a+cursor, len-cursor);
+	r2[len-cursor] = '\0';
+	free(a);
+	result[0] = r1;
+	result[1] = r2;
+	return result;
+}
