@@ -25,6 +25,7 @@ char * input_text(G_Surface * input_buffer, char * text, int cursor){
 			text = str_concat(tmp[0], tmp[1]);
 
 			input_set_key(input_buffer, i, 0);
+			return text;
 		}
 		if(i == I_DEL && input_get_key(input_buffer, i)){
 			char ** tmp = str_divide(text, cursor);
@@ -32,7 +33,8 @@ char * input_text(G_Surface * input_buffer, char * text, int cursor){
 			tmp[0] = str_shorten(tmp[0], 1);
 			text = str_concat(tmp[0], tmp[1]);
 			
-			input_set_key(input_buffer, i, 0);			
+			input_set_key(input_buffer, i, 0);
+			return text;
 		}
 	}
 	return text;

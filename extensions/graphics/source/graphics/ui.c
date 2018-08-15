@@ -12,7 +12,7 @@ G_ScrollText * g_create_scrolltext(G_Surface * font, char autoscroll, Rect rect)
 }
 
 void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
-	if(scrolltext->autoscroll){
+	if(scrolltext->autoscroll == 1){
 		scrolltext->sx += -1;
 	}
 	vec2 size = {scrolltext->font->width/FONT_SIZE, scrolltext->font->height/FONT_SIZE};	
@@ -26,6 +26,7 @@ void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
 			int len = j+(scrolltext->text[j] == '\n' ? 0 : 1) - lline;
 			int s = (scrolltext->rect.width-len*size.x)/size.x;
 			if(s < 2) s = 2;
+			if(scrolltext->autoscroll) s = scrolltext->rect.width/size.x;
 			int sx = ((len+s)*size.x + (scrolltext->sx%((len+s)*size.x)))
 				% ((len+s)*size.x);
 	

@@ -55,11 +55,11 @@ void ncurses_input(G_Scene * scene){
 			case 40219: //Down
 				val = I_DOWN;
 				break;
-			case 40731:  //Right
-				val = I_RIGHT;
-				break;
-			case 40475: //Left
+			case 40731:  //Left
 				val = I_LEFT;
+				break;
+			case 40475: //Right
+				val = I_RIGHT;
 				break;
 		}
 	}
