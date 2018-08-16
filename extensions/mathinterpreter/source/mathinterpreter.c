@@ -8,14 +8,16 @@ const char hierarchy[] = {
 	MI_MUL,
 	MI_DIV,
 	MI_POW,
-	MI_NUM	
+	MI_NUM
 };
 
 
 // Functions, TODO Implement this in a proper way
 const char * functions[] = {
 	MI_FUN_COS,
-	MI_FUN_SIN
+	MI_FUN_SIN,
+	MI_FUN_MOD,
+	MI_FUN_POW,
 };
 const int functions_size[] = {
 	3,
@@ -61,7 +63,7 @@ int8_t mathinterpreter_eval_char(char * character){
 
 // This method is essential when transforming from char array to float
 float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar){
-	
+
 	//Comma position
 	int e = 0;
 
@@ -81,9 +83,9 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	int l = endchar - startchar - (e == 0 ? 0 : 1);
 	for(int i = startchar; (i <= endchar); i++){
 		if(mathinterpreter_is_number(str+i)){
-			if(exp < (e-startchar) || e == 0) val = val + 
+			if(exp < (e-startchar) || e == 0) val = val +
 				mathinterpreter_eval_char(str+i)*mathinterpreter_pow(0xA,l-exp-(e == 0 ? 0 : endchar-e));
-			else val2 = val2 + 
+			else val2 = val2 +
 				mathinterpreter_eval_char(str+i)*(1.0f/mathinterpreter_pow(0xA,exp-(e-startchar)+1));
 			exp++;
 		}
@@ -94,7 +96,7 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 
 // Basic char * comparison
 int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
-	
+
 	int code = -1;
 	for(int i = startchar; i <= endchar; i++){
 		for(int j = 0; j < MI_FUN_SIZE; j++){
@@ -104,7 +106,7 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 		}
 	}
 	for(int i = 0; i < MI_FUN_SIZE; i++){
-		if(!functions_search_bool[i] && startchar != endchar && 
+		if(!functions_search_bool[i] && startchar != endchar &&
 			endchar-startchar == functions_size[i]-1) code = i;
 		functions_search_bool[i] = 0;
 	}
@@ -124,7 +126,7 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 
 	// Only called if the function is just a parenthesis
 	if(endfun+1 == startchar && startchar != endchar) return mathinterpreter_read(0, str, startchar+1, endchar-1);
-	
+
 	// Memory allocation for the function
 	Mi_Node * fun = malloc(sizeof(Mi_Fun_Node));
 	fun->fun.type = MI_FUN;
@@ -143,7 +145,7 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 		return fun;
 	}
 
-		
+
 
 	// stupid c... search comma
 	int size = 0;
@@ -153,21 +155,21 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 		}
 	}
 	args->size = size;
-	
+
 	Mi_Node ** nodearg = malloc(sizeof(Mi_Node *)*size);
 	int lc = endfun+1;
 	int c = 0;
 	for(int i = endfun+2; i <= endchar; i++){
 		if(*(str+i) == MI_COMMA || i == endchar){
 			Mi_Node * node = mathinterpreter_read(0, str, lc+1, i-1);
-			nodearg[c] = node; 
+			nodearg[c] = node;
 			c++;
 			lc = i;
 		}
 	}
 	args->args = nodearg;
 
-	
+
 	return fun;
 }
 
@@ -203,14 +205,14 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 		if(equation[i] == MI_SUB_CLOSER) par++;
 
 
-		
+
 
 		// Get the new type of character
 		if(i > endchar) ntype = (ltype == MI_NUM ? MI_FUN : MI_NUM);
 		else{
 
 			if(equation[i] == MI_SUB_CLOSER && par == 0){
-		
+
 				ltype = -1; // If a parenthesis ends, there is a new function
 				i++;
 
@@ -222,16 +224,16 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 		char val = ltype - ntype; // this simplify a lot the logic
 
 		if(i!= startchar){
-			
+
 
 			// This is true if the program has found the start of a function,
 			if(val == MI_NUM - MI_FUN){
 
 				// Read the nummber
-				
+
 				Mi_Node *  addcurrent = malloc(sizeof(Mi_Node));
 				addcurrent->op.type = MI_MUL;
-					
+
 				Mi_Node * number = malloc(sizeof(Mi_Node));
 				number->num.type = MI_NUM;
 				number->num.value = mathinterpreter_get_value_from_str(equation, li, i-1);
@@ -244,7 +246,7 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 
 				li = i;
 
-			
+
 			// Only true when comming from a function to a number sin()_(here)_3
 			}else if(val != 0 || ltype == -1){
 
@@ -258,8 +260,8 @@ Mi_Node * mathinterpreter_read_mono(char * equation, int startchar, int endchar)
 				current = addcurrent;
 
 				li = i;
-				
-				
+
+
 			}
 		}
 		ltype = ntype; // Set the ltype to keep track of the prev. char.
@@ -282,7 +284,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 	// Syntax error detected, this is mostly caused by double operator
 	if(startchar > endchar){
-		
+
 		//Negative void TODO Fix this for functions
 		if(equation[startchar] == MI_MINUS && !mathinterpreter_internal_is_op(equation+startchar+1)){
 			Mi_Node * this = malloc(sizeof(Mi_Node));
@@ -300,11 +302,11 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 		return mathinterpreter_read_mono(equation, startchar, endchar);
 
 	}
-	
+
 	int par = 0;
 
 	for(int i = endchar; i >= startchar; i--){
-		
+
 		if(equation[i] == MI_SUB_OPENER) par--;
 		if(equation[i] == MI_SUB_CLOSER) par++;
 
@@ -321,7 +323,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 			this->op.type = hierarchy[hierarchy_level];
 			this->op.a = a;
 			this->op.b = b;
-			return this; 
+			return this;
 
 		}
 	}
@@ -333,7 +335,7 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 
-	
+
 	switch(node->op.type){
 
 		case MI_NUM:
@@ -348,6 +350,30 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
 						return cos(a);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+					break;
+
+				case 1: // Sin
+					if(node->fun.args->size == 1){
+						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
+						return sin(a);
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+					break;
+
+				case 2: // Mod %
+					if(node->fun.args->size == 2){
+						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
+						float b = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args+1), error);
+						return (int)a%(int)b;
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+					break;
+
+				case 3: // Pow
+					if(node->fun.args->size == 2){
+						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
+						float b = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args+1), error);
+						return powf(a,b);
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+					break;
 
 				default:
 					*error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid function name")->err;
@@ -377,7 +403,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 			b = mathinterpreter_solve(node->op.b, error);
 			//Division by zero
 			if(b == 0.0f){
-				*error = (mathinterpreter_error(MI_ERROR_DIV_BY_ZERO, 
+				*error = (mathinterpreter_error(MI_ERROR_DIV_BY_ZERO,
 					"Can not divide by zero")->err);
 				return 0.0f;
 			}
@@ -386,7 +412,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_POW:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
-			return powf(a, b);	
+			return powf(a, b);
 
 		default:
 			*error = node->err;
@@ -400,7 +426,7 @@ void mathinterpreter_free(Mi_Node * node){
 	switch(node->op.type){
 		case MI_NUM:
 			break;
-		
+
 		case MI_FUN:
 			for(int i = 0; i < node->fun.args->size; i++){
 				mathinterpreter_free(*((Mi_Node**)node->fun.args->args+i));
@@ -408,7 +434,7 @@ void mathinterpreter_free(Mi_Node * node){
 			break;
 
 		default:
-			if(node->op.type == MI_PLUS || node->op.type == MI_PLUS || 
+			if(node->op.type == MI_PLUS || node->op.type == MI_PLUS ||
 				node->op.type == MI_MUL || node->op.type == MI_DIV || node->op.type == MI_POW){
 				mathinterpreter_free(node->op.a);
 				mathinterpreter_free(node->op.b);
@@ -436,4 +462,3 @@ Mi_Node * mathinterpreter_error(char code, char * error){
 
 	return this;
 }
-

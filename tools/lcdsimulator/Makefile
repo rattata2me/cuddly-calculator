@@ -2,13 +2,14 @@
 # gcc is ok for this
 CC = gcc
 
-
 INCLUDE_DIRECTORY = include
 LIBRARY_DIRECTORY = ../../extensions/graphics/build
-INCLUDE_LIBRARY =  ../../extensions/graphics/include 
+INCLUDE_LIBRARY =  ../../extensions/graphics/include
 IMAGES_DIRECTORY = ../../extensions/graphics/images
 SOURCE_DIRECTORY = source
 BUILD_DIRECTORY = build
+SDL_ROOT_DIR = /usr/x86_64-w64-mingw32/bin
+
 
 GRAPHICS = SDL_SIM
 
@@ -16,7 +17,9 @@ CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(INCLUDE_LIBRARY) -I$(IMAGES_DIRECTORY) -g -W
 
 _OBJECT_FILES = main.o
 
-LIBS = `sdl2-config --cflags --libs` -lSDL2 
+
+
+LIBS = `sdl2-config --cflags --libs` -lSDL2
 
 ifeq ($(GRAPHICS), SDL_SIM)
 	_OBJECT_FILES += sdl_window.o
@@ -35,9 +38,16 @@ OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 
 all: main
 
+
+
+windows_set:
+	$(eval LIBS = $(subst sdl2-config,$(SDL_ROOT_DIR)/sdl2-config,$(LIBS)))
+
+windows: windows_set main
+
 .PHONY: makebuild
 
-makebuild: 
+makebuild:
 	@mkdir -p build
 	@mkdir -p build
 	@mkdir -p build
@@ -47,7 +57,7 @@ library:
 
 $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild library
 	$(CC) -c -o $@ $< $(CFLAGS)
-	
+
 
 main: $(OBJ)
 	$(CC) -o $(BUILD_DIRECTORY)/$@ $^ $(CFLAGS) $(LIBS)
@@ -55,8 +65,5 @@ main: $(OBJ)
 
 .PHONY: clean
 clean:
-	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/main 
+	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/main
 	@cd $(LIBRARY_DIRECTORY) && cd .. && make clean
-
-
-

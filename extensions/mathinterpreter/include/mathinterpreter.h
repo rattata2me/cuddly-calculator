@@ -30,8 +30,11 @@ extern const char hierarchy[MI_OP_SIZE];
 //Functions, need to be defined from longest to shortest in alphabetical order
 #define MI_FUN_SIN "sin"
 #define MI_FUN_COS "cos"
+#define MI_FUN_POW "pow"
+#define MI_FUN_MOD "mod"
 
-#define MI_FUN_SIZE 2
+#define MI_FUN_SIZE 4
+
 extern const char * functions[MI_FUN_SIZE];
 extern const int functions_size[MI_FUN_SIZE]; // C...
 
@@ -69,7 +72,7 @@ typedef struct{
 } Mi_Op_Node;
 
 typedef struct{
-	
+
 	char type;
 
 	char code;
