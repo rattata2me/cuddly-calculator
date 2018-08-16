@@ -13,7 +13,7 @@ SDL_ROOT_DIR = /usr/x86_64-w64-mingw32/bin
 
 GRAPHICS = SDL_SIM
 
-CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(INCLUDE_LIBRARY) -I$(IMAGES_DIRECTORY) -g -Wall -Werror -pedantic  -D $(GRAPHICS)
+CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(INCLUDE_LIBRARY) -I$(IMAGES_DIRECTORY) -g -Wall -Werror -pedantic  -D $(GRAPHICS) -std=gnu11
 
 _OBJECT_FILES = main.o
 

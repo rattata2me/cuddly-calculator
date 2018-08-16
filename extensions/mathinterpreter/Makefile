@@ -7,7 +7,7 @@ INCLUDE_DIRECTORY = include
 SOURCE_DIRECTORY = source
 BUILD_DIRECTORY = build
 
-CFLAGS = -I$(INCLUDE_DIRECTORY) -g -Wall -pedantic -Werror
+CFLAGS = -I$(INCLUDE_DIRECTORY) -g -Wall -pedantic -Werror -std=gnu11
 
 _OBJECT_FILES = mathinterpreter.o
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
@@ -20,7 +20,7 @@ LIB_NAME = libmi.a
 
 .PHONY: makebuild
 
-makebuild: 
+makebuild:
 	@mkdir -p build
 
 $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild
@@ -35,6 +35,4 @@ main: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/*.a 
-
-
+	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/*.a

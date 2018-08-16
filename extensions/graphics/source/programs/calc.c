@@ -5,6 +5,7 @@
 #include "graphics/ui.h"
 #include "mathinterpreter.h"
 
+
 G_Surface * s, * b;
 
 G_ScrollText * mathinput, * result;
@@ -31,21 +32,21 @@ void calc_init(void * v_scene){
 
 
 void update_mathinput(G_Scene * scene){
-	
+
 	char * ptext = mathinput->text;
 	int mi_prev_len = str_len(ptext);
 
 	mathinput->text = input_text(scene->input_buffer, mathinput->text, cursor);
-	
-	
+
+
 	int mathinputlen = str_len(mathinput->text);
 
 	if(mi_prev_len != mathinputlen){
 		scene->need_update = 1;
-		cursor += mathinputlen - mi_prev_len; 
+		cursor += mathinputlen - mi_prev_len;
 	}
 
-	if(input_get_key(scene->input_buffer, I_LEFT)){ 
+	if(input_get_key(scene->input_buffer, I_LEFT)){
 		cursor --;
 		input_set_key(scene->input_buffer, I_LEFT, 0);
 	}
@@ -60,7 +61,7 @@ void update_mathinput(G_Scene * scene){
 
 	if(cursor > (mathinput->rect.width/g_font_size(mathinput->font).x)+startpoint-1)
 		startpoint++;
-	if(cursor <= startpoint) 
+	if(cursor <= startpoint)
 		startpoint -= 1;
 	startpoint < 0 ? startpoint = 0 : 0;
 
@@ -85,7 +86,7 @@ void update_mathinput(G_Scene * scene){
 	// Draw everything
 	g_clear(scene->buffer);
 	g_draw_scrolltext(scene->buffer, mathinput);
-	g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0), 
+	g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
 			vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
 	g_draw_scrolltext(scene->buffer, result);
 	scene->need_update = 1;
@@ -94,11 +95,11 @@ void update_mathinput(G_Scene * scene){
 
 
 void calc_draw(void * v_scene){
-	
+
 	G_Scene * scene = (G_Scene*)v_scene;
-	
+
 	update_mathinput(scene);
-	
+
 	/*Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 	float res = mathinterpreter_eval(cuddly->text, str_len(cuddly->text), &error);
 	gcvt(res, 6, scrolltext->text);

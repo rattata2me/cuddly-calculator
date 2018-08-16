@@ -12,7 +12,7 @@ BUILD_DIRECTORY = build
 MI_LIBRARY = ../mathinterpreter/build
 MI_INCLUDE = ../mathinterpreter/include
 
-CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -I$(MI_INCLUDE) -g -Wall -Werror -pedantic
+CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -I$(MI_INCLUDE) -g -Wall -Werror -pedantic -std=gnu11
 
 _OBJECT_FILES = common.o graphics/pixelsurface.o graphics/renderer.o input.o math/vec2.o graphics/texture.o graphics/font.o
 _OBJECT_FILES += math/rect.o graphics/ui.o programs/calc.o
@@ -27,7 +27,7 @@ all: mathinterpreter main
 
 .PHONY: makebuild
 
-makebuild: 
+makebuild:
 	@mkdir -p build
 	@mkdir -p build/graphics
 	@mkdir -p build/math
@@ -50,17 +50,15 @@ $(IMAGES_DIRECTORY)/%.o: $(IMAGES_DIRECTORY)/%.c
 
 $(BUILD_DIRECTORY)/%.o: $(SOURCE_DIRECTORY)/%.c makebuild
 	$(CC) -c -o $@ $< $(CFLAGS)
-	
+
 
 mathinterpreter:
-	cd $(MI_LIBRARY)/.. && make all	
+	cd $(MI_LIBRARY)/.. && make all
 
-main: $(IMAGES_OBJECT_FILES) $(OBJ) 
+main: $(IMAGES_OBJECT_FILES) $(OBJ)
 	ar rcs $(BUILD_DIRECTORY)/$(LIB_NAME) $^
 	@echo Library Succesfully compiled!!!
 
 .PHONY: clean
 clean:
 	rm -f $(BUILD_DIRECTORY)/*.o $(BUILD_DIRECTORY)/main $(IMAGES_DIRECTORY)/*.c $(IMAGES_DIRECTORY)/*.h $(IMAGES_DIRECTORY)/*.o
-
-
