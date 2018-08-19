@@ -21,11 +21,15 @@ const char * functions[] = {
 };
 const int functions_size[] = {
 	3,
+	3,
+	3,
 	3
 };
 
 // This method is crappy af
 char functions_search_bool[] = {
+	0,
+	0,
 	0,
 	0
 };
@@ -101,7 +105,7 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 	for(int i = startchar; i <= endchar; i++){
 		for(int j = 0; j < MI_FUN_SIZE; j++){
 			if(functions_size[j] > (i-startchar)){
-				if(functions[j][i-startchar] != str[i]) functions_search_bool[j] = 1;
+				if(functions[j][i-startchar] != (str[i]&0x5f)) functions_search_bool[j] = 1;
 			}else functions_search_bool[j] = 1;
 		}
 	}
@@ -342,7 +346,6 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 			return node->num.value;
 
 		case MI_FUN:
-
 			switch(node->fun.fun_type){
 				// TODO Create a better method
 				case 0: // Cos
@@ -379,6 +382,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 					*error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid function name")->err;
 					return 1.0f;
 			}
+			break;
 
 		float a = 0.0f;
 		float b = 0.0f;

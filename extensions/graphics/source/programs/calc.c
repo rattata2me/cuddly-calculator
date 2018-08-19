@@ -10,8 +10,11 @@ G_Surface * s, * b;
 
 G_ScrollText * mathinput, * result;
 
+G_ScrollList * predictor_list;
+
 int cursor = 0;
 int startpoint = 0;
+int functionlen = 0;
 
 void calc_init(void * v_scene){
 
@@ -27,9 +30,13 @@ void calc_init(void * v_scene){
 
 	mathinput = g_create_scrolltext(b, 2, rect_create(2,2,126,20));
 	result = g_create_scrolltext(b, 2, rect_create(2, 40, 126, 20));
+	//predictor_list = g_create_scrolllist(6, s, rect_create(0,22,120,40));
 
 }
 
+void update_functionpredictor(G_Scene * scene){
+
+}
 
 void update_mathinput(G_Scene * scene){
 
@@ -41,6 +48,9 @@ void update_mathinput(G_Scene * scene){
 
 	int mathinputlen = str_len(mathinput->text);
 
+
+	// SET CURSOR POSITION
+
 	if(mi_prev_len != mathinputlen){
 		scene->need_update = 1;
 		cursor += mathinputlen - mi_prev_len;
@@ -49,10 +59,13 @@ void update_mathinput(G_Scene * scene){
 	if(input_get_key(scene->input_buffer, I_LEFT)){
 		cursor --;
 		input_set_key(scene->input_buffer, I_LEFT, 0);
+		scene->need_update = 1;
 	}
+
 	if(input_get_key(scene->input_buffer, I_RIGHT)){
 		cursor ++;
 		input_set_key(scene->input_buffer, I_RIGHT, 0);
+		scene->need_update = 1;
 	}
 
 	cursor = cursor > mathinputlen ? 0 : cursor;
@@ -64,6 +77,9 @@ void update_mathinput(G_Scene * scene){
 	if(cursor <= startpoint)
 		startpoint -= 1;
 	startpoint < 0 ? startpoint = 0 : 0;
+
+
+	// SPECIAL KEYS INPUT
 
 	if(input_get_key(scene->input_buffer, I_RETURN)){
 		free(mathinput->text);
@@ -80,6 +96,18 @@ void update_mathinput(G_Scene * scene){
 		else result->text = str_new("Error");
 		input_set_key(scene->input_buffer, I_ENTER, 0);
 		scene->need_update = 1;
+	}
+
+
+	// FUNCTION "PREDICTION"
+
+	if((mathinput->text[mathinputlen]&0x5f) > 'A' && (mathinput->text[mathinputlen]&0x5f) < 'Z'){
+		functionlen++;
+	}else{
+		functionlen = 0;
+	}
+	if(functionlen > 0){
+
 	}
 
 	mathinput->sx = -g_font_size(mathinput->font).x*startpoint;
@@ -99,12 +127,7 @@ void calc_draw(void * v_scene){
 	G_Scene * scene = (G_Scene*)v_scene;
 
 	update_mathinput(scene);
-
-	/*Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
-	float res = mathinterpreter_eval(cuddly->text, str_len(cuddly->text), &error);
-	gcvt(res, 6, scrolltext->text);
-	scrolltext->text = str_concat(str_new("Response = "), scrolltext->text);
-	input_set_key(scene->input_buffer, I_ENTER, 0);*/
+	//g_draw_scrolllist(scene->buffer, predictor_list);
 
 }
 

@@ -28,10 +28,10 @@
 extern const char hierarchy[MI_OP_SIZE];
 
 //Functions, need to be defined from longest to shortest in alphabetical order
-#define MI_FUN_SIN "sin"
-#define MI_FUN_COS "cos"
-#define MI_FUN_POW "pow"
-#define MI_FUN_MOD "mod"
+#define MI_FUN_SIN "SIN"
+#define MI_FUN_COS "COS"
+#define MI_FUN_POW "POW"
+#define MI_FUN_MOD "MOD"
 
 #define MI_FUN_SIZE 4
 
