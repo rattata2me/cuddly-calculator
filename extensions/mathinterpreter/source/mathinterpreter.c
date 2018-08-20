@@ -13,7 +13,7 @@ const char hierarchy[] = {
 
 
 // Functions, TODO Implement this in a proper way
-const char * functions[] = {
+char * functions[] = {
 	MI_FUN_COS,
 	MI_FUN_SIN,
 	MI_FUN_MOD,
@@ -27,12 +27,7 @@ const int functions_size[] = {
 };
 
 // This method is crappy af
-char functions_search_bool[] = {
-	0,
-	0,
-	0,
-	0
-};
+char functions_search_bool[MI_FUN_SIZE];
 
 
 // Slow, but with this method I avoid float errors; TODO use the 2 trick
@@ -97,11 +92,8 @@ float mathinterpreter_get_value_from_str(char * str, int startchar, int endchar)
 	return (e == 0 ? (float)val : val+val2);
 }
 
-
-// Basic char * comparison
-int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
-
-	int code = -1;
+char * mathinterpreterer_prepare_prediction(char * str, int startchar, int endchar){
+	memset(functions_search_bool, 0, MI_FUN_SIZE);
 	for(int i = startchar; i <= endchar; i++){
 		for(int j = 0; j < MI_FUN_SIZE; j++){
 			if(functions_size[j] > (i-startchar)){
@@ -109,6 +101,15 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 			}else functions_search_bool[j] = 1;
 		}
 	}
+	return functions_search_bool;
+}
+
+// Basic char * comparison
+int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
+
+	int code = -1;
+
+	mathinterpreterer_prepare_prediction(str, startchar, endchar);
 	for(int i = 0; i < MI_FUN_SIZE; i++){
 		if(!functions_search_bool[i] && startchar != endchar &&
 			endchar-startchar == functions_size[i]-1) code = i;

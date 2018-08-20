@@ -35,9 +35,9 @@ extern const char hierarchy[MI_OP_SIZE];
 
 #define MI_FUN_SIZE 4
 
-extern const char * functions[MI_FUN_SIZE];
+extern char * functions[MI_FUN_SIZE];
 extern const int functions_size[MI_FUN_SIZE]; // C...
-
+extern char functions_search_bool[MI_FUN_SIZE];
 
 typedef struct{
 
@@ -97,6 +97,8 @@ int32_t mathinterpreter_pow(int32_t a, int x);
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error);
 
 bool mathinterpreter_is_number(char * character);
+
+char * mathinterpreterer_prepare_prediction(char * str, int startchar, int endchar);
 
 int mathinterpreter_get_function_code(char * str, int startchar, int endchar);
 

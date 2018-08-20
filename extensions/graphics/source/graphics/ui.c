@@ -121,7 +121,7 @@ G_ScrollList * g_create_scrolllist(int size, G_Surface * font, Rect rect){
 	scrolllist->list = malloc(sizeof(G_ScrollText*)*(rect.height/sizey));
 	scrolllist->text = malloc(sizeof(char*)*size);
 	for(int i = 0; i < size; i++){
-		scrolllist->text[i] = str_new("wdwwdd");
+		scrolllist->text[i] = str_new("");
 		if(i < rect.height/sizey) scrolllist->list[i] = g_create_scrolltext(font, 0, rect_create(rect.x, rect.y+sizey*i, rect.width, sizey));
 	}
 	return scrolllist;
