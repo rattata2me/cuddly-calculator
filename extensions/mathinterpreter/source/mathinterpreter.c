@@ -18,13 +18,17 @@ char * functions[] = {
 	MI_FUN_SIN,
 	MI_FUN_MOD,
 	MI_FUN_POW,
+	MI_FUN_PI
 };
 const int functions_size[] = {
 	3,
 	3,
 	3,
-	3
+	3,
+	2
 };
+
+char MI_USE_RADIANS = 0;
 
 // This method is crappy af
 char functions_search_bool[MI_FUN_SIZE];
@@ -338,6 +342,20 @@ Mi_Node * mathinterpreter_read(int hierarchy_level, char * equation, int startch
 
 }
 
+const float epsilon = 0.0001f;
+float mi_cos(float a){
+	if(!MI_USE_RADIANS){
+		if(a >= M_PI/2-epsilon && a <=M_PI/2+epsilon) return 0.0f;
+		if(a >= (M_PI/2)*3-epsilon && a <=(M_PI/2)*3+epsilon) return 0.0f;
+	}
+	return cos(a);
+}
+float mi_sin(float a){
+	if(a >= M_PI-epsilon && a <=M_PI+epsilon) return 0.0f;
+	if(a >= M_PI*2-epsilon && a <=M_PI*2+epsilon) return 0.0f;
+	return sin(a);
+}
+
 float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 
 
@@ -352,14 +370,16 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 				case 0: // Cos
 					if(node->fun.args->size == 1){
 						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
-						return cos(a);
+						if(!MI_USE_RADIANS) a = (a/180)*M_PI;
+						return mi_cos(a);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 					break;
 
 				case 1: // Sin
 					if(node->fun.args->size == 1){
 						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
-						return sin(a);
+						if(!MI_USE_RADIANS) a = (a/180)*M_PI;
+						return mi_sin(a);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 					break;
 

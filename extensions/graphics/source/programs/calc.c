@@ -31,7 +31,7 @@ void calc_init(void * v_scene){
 
 	mathinput = g_create_scrolltext(b, 2, rect_create(2,2,126,20));
 	result = g_create_scrolltext(b, 2, rect_create(2, 40, 126, 20));
-	predictor_list = g_create_scrolllist(6, s, rect_create(0,22,120,40));
+	predictor_list = g_create_scrolllist(6, s, rect_create(0,22,120,36));
 
 }
 
@@ -43,7 +43,6 @@ void update_functionpredictor(G_Scene * scene){
 	mathinterpreterer_prepare_prediction(mathinput->text, start, cursor-1);
 	int j = 0;
 	for(int i = 0; i < MI_FUN_SIZE; i++){
-		//printf("%i index %i start\n",functions_search_bool[i], start);
 		if(!functions_search_bool[i] && j < predictor_list->size){
 			free(predictor_list->text[j]);
 			predictor_list->text[j] = str_new(functions[i]);
@@ -74,6 +73,8 @@ void update_functionpredictor(G_Scene * scene){
 
 }
 
+int timer = 0;
+
 void update_mathinput(G_Scene * scene){
 
 	char * ptext = mathinput->text;
@@ -96,13 +97,59 @@ void update_mathinput(G_Scene * scene){
 
 	if(input_get_key(scene->input_buffer, I_LEFT)){
 		cursor --;
+		functionlen = 0;
 		input_set_key(scene->input_buffer, I_LEFT, 0);
 		scene->need_update = 1;
 	}
 
 	if(input_get_key(scene->input_buffer, I_RIGHT)){
 		cursor ++;
+		functionlen = 0;
 		input_set_key(scene->input_buffer, I_RIGHT, 0);
+		scene->need_update = 1;
+	}
+
+
+
+
+	// FUNCTION "PREDICTION"
+	int nlen = str_len(mathinput->text);
+	if(mi_prev_len != nlen && cursor-1 >= 0){
+		if((mathinput->text[cursor-1]&0x5f) >= 67 && (mathinput->text[cursor-1]&0x5f) <= 90){
+			functionlen += nlen - mi_prev_len;
+			functionlen = functionlen < 0 ? 0 : functionlen;
+			ycursor = 0;
+		}else functionlen = 0;
+	}
+	printf("%i\n", functionlen);
+
+	// SPECIAL KEYS INPUT
+
+	if(input_get_key(scene->input_buffer, I_RETURN)){
+		free(mathinput->text);
+		mathinput->text = str_new("");
+		input_set_key(scene->input_buffer, I_RETURN, 0);
+		scene->need_update = 1;
+	}
+	if(input_get_key(scene->input_buffer, I_ENTER)){
+		// Process everything with mathinterpreter
+		if(functionlen < 1){
+			Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
+			float res = mathinterpreter_eval(mathinput->text,  mathinputlen, &error);
+			gcvt(res, 5, result->text);
+			if(error.code == MI_ERROR_NONE)
+				 result->text = str_concat(str_new("="), result->text);
+			else result->text = str_new("Error");
+		}else{
+			char ** tmp = str_divide(mathinput->text, cursor);
+			tmp[0] = str_shorten(tmp[0],functionlen);
+			cursor -= functionlen;
+			mathinput->text = str_concat(tmp[0], str_concat(str_new(predictor_list->list[ycursor]->text), tmp[1]));
+			cursor += str_len(predictor_list->list[ycursor]->text);
+			mathinputlen += str_len(predictor_list->list[ycursor]->text);
+			functionlen = 0;
+		}
+		input_set_key(scene->input_buffer, I_ENTER, 0);
 		scene->need_update = 1;
 	}
 
@@ -116,49 +163,18 @@ void update_mathinput(G_Scene * scene){
 		startpoint -= 1;
 	startpoint < 0 ? startpoint = 0 : 0;
 
-
-	// SPECIAL KEYS INPUT
-
-	if(input_get_key(scene->input_buffer, I_RETURN)){
-		free(mathinput->text);
-		mathinput->text = str_new("");
-		input_set_key(scene->input_buffer, I_RETURN, 0);
-		scene->need_update = 1;
-	}
-	if(input_get_key(scene->input_buffer, I_ENTER)){
-		// Process everything with mathinterpreter
-		Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
-		float res = mathinterpreter_eval(mathinput->text,  mathinputlen, &error);
-		gcvt(res, 6, result->text);
-		if(error.code == MI_ERROR_NONE) result->text = str_concat(str_new(" =  "), result->text);
-		else result->text = str_new("Error");
-		input_set_key(scene->input_buffer, I_ENTER, 0);
-		scene->need_update = 1;
-	}
-
-
-	// FUNCTION "PREDICTION"
-	int nlen = str_len(mathinput->text);
-	if(mi_prev_len != nlen){
-		if((mathinput->text[cursor-1]&0x5f) >= 67 && (mathinput->text[cursor-1]&0x5f) <= 90){
-			functionlen += nlen - mi_prev_len;
-			ycursor = 0;
-		}else functionlen = 0;
-	}
-
-
 	mathinput->sx = -g_font_size(mathinput->font).x*startpoint;
 	// Draw everything
 	g_clear(scene->buffer);
 	g_draw_scrolltext(scene->buffer, mathinput);
-	g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
+	if((timer/30 % 2) == 0)g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
 			vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
 	g_draw_scrolltext(scene->buffer, result);
 	if(functionlen > 0){
 		update_functionpredictor(scene);
 	}
 	scene->need_update = 1;
-
+	timer++;
 }
 
 

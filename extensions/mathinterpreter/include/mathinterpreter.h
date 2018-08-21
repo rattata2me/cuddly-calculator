@@ -32,9 +32,14 @@ extern const char hierarchy[MI_OP_SIZE];
 #define MI_FUN_COS "COS"
 #define MI_FUN_POW "POW"
 #define MI_FUN_MOD "MOD"
+#define MI_FUN_PI "PI"
 
-#define MI_FUN_SIZE 4
+#define MI_FUN_SIZE 5
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif
+extern char MI_USE_RADIANS;
 extern char * functions[MI_FUN_SIZE];
 extern const int functions_size[MI_FUN_SIZE]; // C...
 extern char functions_search_bool[MI_FUN_SIZE];
