@@ -18,4 +18,8 @@ typedef struct{
 } mat3x3f;
 
 mat3x3f mat3x3f_create();
+mat3x3f mat3x3f_scale(mat3x3f mat, vec3 scalar);
+vec3 mat3x3f_mul_vec3(mat3x3f mat, vec3 vec);
+mat3x3f mat3x3f_mul_mat3x3f(mat3x3f mat, mat3x3f mat2);
+mat3x3f mat3x3f_rot(int yaw, int pitch, int roll);
 #endif
