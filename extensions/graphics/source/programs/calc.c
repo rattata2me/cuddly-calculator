@@ -121,7 +121,6 @@ void update_mathinput(G_Scene * scene){
 			ycursor = 0;
 		}else functionlen = 0;
 	}
-	printf("%i\n", functionlen);
 
 	// SPECIAL KEYS INPUT
 

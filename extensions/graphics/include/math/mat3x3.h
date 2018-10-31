@@ -4,6 +4,7 @@
 #include "common.h"
 
 #include "math/vec3.h"
+#include <math.h>
 
 /*
 | M00, M03, M06 |
@@ -21,5 +22,5 @@ mat3x3f mat3x3f_create();
 mat3x3f mat3x3f_scale(mat3x3f mat, vec3 scalar);
 vec3 mat3x3f_mul_vec3(mat3x3f mat, vec3 vec);
 mat3x3f mat3x3f_mul_mat3x3f(mat3x3f mat, mat3x3f mat2);
-mat3x3f mat3x3f_rot(int yaw, int pitch, int roll);
+mat3x3f mat3x3f_rot(mat3x3f mat, int x, int y, int z);
 #endif

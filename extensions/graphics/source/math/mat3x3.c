@@ -47,21 +47,27 @@ mat3x3f mat3x3f_mul_mat3x3f(mat3x3f mat, mat3x3f mat2){
 
 mat3x3f mat3x3f_rot(mat3x3f mat, int x, int y, int z){
 	mat3x3f result = mat;
-	result = mat3x3f_mul_mat3x3f(result,
+
+	mat3x3f zm = {
 		cos(z), sin(z), 0,
 		-sin(z), cos(z), 0,
 		0, 0, 1
-	);
-	result = mat3x3f_mul_mat3x3f(result,
+	};
+	result = mat3x3f_mul_mat3x3f(result, zm);
+
+	mat3x3f ym = {
 		cos(y), 0, -sin(y),
 		0, 1, 0,
 		sin(y), 0, cos(y)
-	);
-	result = mat3x3f_mul_mat3x3f(result,
+	};
+	result = mat3x3f_mul_mat3x3f(result, ym);
+
+	mat3x3f xm = {
 		1, 0, 0,
 		0, cos(x), sin(x),
 		0, -sin(x), cos(x)
-	);
+	};
+	result = mat3x3f_mul_mat3x3f(result, xm);
 	return result;
 }
 
