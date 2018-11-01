@@ -1,8 +1,8 @@
 #include "programs/graph.h"
 #include "mathinterpreter.h"
 
-
-int values[128];
+#define precision 32
+int values[precision];
 
 vec2 oaxis;
 
@@ -17,20 +17,25 @@ void graph_init(void * v_scene){
 
 }
 
-char * EXPRESSION = "SIN(X*5)*32";
+char * EXPRESSION = "X*X";
 
-int px = -64;
+int px = 0;
 float sx = 1;
+int n;
 
 void update_graph_values(G_Scene * scene){
 
+	n = 128/precision;
+
 	oaxis = vec2_create(scene->buffer->width/2, scene->buffer->height/2);
 
-	for(int i = 0; i < 128; i++){
-		MI_X = (float)(i+px)*sx;
+	int j = -64;
+	for(int i = 0; i < precision; i++){
+		MI_X = (float)(j+px)*sx;
 		Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 		float res = mathinterpreter_eval(EXPRESSION,  str_len(EXPRESSION), &error);
 		values[i] = (int)res;
+		j+=n;
 	}
 }
 
@@ -66,12 +71,16 @@ void update_plane(G_Scene * scene){
 
 		update_graph_values(scene);
 
+
+
 		//Draw axis
 		g_draw_line(scene->buffer, vec2_add(oaxis, -px, -32), vec2_add(oaxis, -px, 32), 1);
 		g_draw_line(scene->buffer, vec2_add(oaxis, -64, 0), vec2_add(oaxis, 128, 0), 1);
 
-		for(int x = 0; x < 128; x++){
-			g_set_pixel(scene->buffer, x, -values[x]+32, 1);
+		int j = 0;
+		for(int x = 0; x < precision-1; x++){
+			g_draw_line(scene->buffer, vec2_create(j, -values[x]+32), vec2_create(j+n, -values[x+1]+32), 1);
+			j+=n;
 		}
 
 
