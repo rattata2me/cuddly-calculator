@@ -9,6 +9,7 @@
 #include "smallfont.h"
 #include "graphics/ui.h"
 #include "programs/calc.h"
+#include "programs/graph.h"
 
 #ifdef SDL_SIM
 	#include "sdl_window.h"
@@ -35,10 +36,10 @@ int esw = 128;
 G_Scene * program;
 
 int init(){
-	
+
 	#ifdef SDL_SIM
 		window = sdl_init_window();
-		if(window == NULL){ 
+		if(window == NULL){
 			return 1;
 		}
 	#endif
@@ -49,7 +50,7 @@ int init(){
 	#endif
 
 	program = malloc(sizeof(G_Scene));
-	
+
 	program->init = &calc_init;
 	program->draw = &calc_draw;
 	program->clear = &calc_clear;
@@ -73,9 +74,9 @@ void render(){
 void enter_main_loop(){
 
 	running = true;
-	
+
 	while(running){
-		
+
 		#ifdef SDL_SIM
 			running = sdl_loop(window, program);
 		#endif
@@ -83,7 +84,7 @@ void enter_main_loop(){
 		#ifdef NCURSES_SIM
 			ncurses_loop(program);
 			ncurses_input(program);
-		#endif 
+		#endif
 		render();
 	}
 
@@ -99,7 +100,7 @@ void quit(){
 
 int main(int argc, char* args[]){
 
-	if(init()){ 
+	if(init()){
 		return 0;
 	}
 
@@ -109,4 +110,3 @@ int main(int argc, char* args[]){
 
 	return 0;
 }
-

@@ -29,17 +29,18 @@ def convert_image(image_file, var_name):
 	img = Image.open(image_file)
 	img = img.convert("RGB")
 	size = img.size
-	sx = ((size[0] + (BYTE_SIZE - (size[0] % BYTE_SIZE))) / BYTE_SIZE)
-	sy = size[1]
+	sy = ((size[1] + (BYTE_SIZE - (size[1] % BYTE_SIZE))) / BYTE_SIZE)
+	sx = size[0]
 	binary = []
-	for y in range(sy):
-		for x in range(sx):
+	print sy
+	for x in range(sx):
+		for y in range(sy):
 			byte = 0
 			for i in range(BYTE_SIZE):
-				px = x*BYTE_SIZE+i
-				if px >= size[0]:
-					px = size[0]-1
-				pixel = img.getpixel((px, y))
+				py = y*BYTE_SIZE+i
+				if py >= size[1]:
+					py = size[1]-1
+				pixel = img.getpixel((x, py))
 				val = 1
 				if pixel == (255, 255, 255):
 					val = 0
@@ -122,7 +123,7 @@ def convert_font(image_folder, var_name):
         "// Auto-generated .C Image file " + str(VERSION) + "\n" \
         "\nunsigned char"
         upper_str = upper_str + " " + var_name + "_pixels[][" + str(sx*size[1]) + "] = {\n"
-	
+
         upper_str += bin_str
 
         upper_str += "\n};\n\nchar " + var_name + "_indices[] = {\n"
@@ -185,7 +186,7 @@ def generatefont_external(font_name):
 
 
 sys.argv.pop(0)
-if len(sys.argv) > 0:	
+if len(sys.argv) > 0:
 	if sys.argv[0] == "image":
 		if len(sys.argv) == 3:
 			var_name = (sys.argv[2])
@@ -203,4 +204,3 @@ if len(sys.argv) > 0:
 		print("efec")
 		if len(sys.argv) == 4:
 		    generatefont_internal(sys.argv[1], int(sys.argv[2]), sys.argv[3])
-

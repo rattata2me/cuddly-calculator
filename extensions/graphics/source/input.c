@@ -6,13 +6,13 @@ G_Surface * input_create_buffer(){
 }
 
 void input_set_key(G_Surface * input_buffer, unsigned char key, char val){
-	g_set_pixel(input_buffer, key%(G_MEMORY_UNIT*input_buffer->striplen), 
-			key/(G_MEMORY_UNIT*input_buffer->striplen), val);
+	g_set_pixel(input_buffer, key/(G_MEMORY_UNIT*input_buffer->striplen),
+		key%(G_MEMORY_UNIT*input_buffer->striplen), val);
 }
 
 int input_get_key(G_Surface * input_buffer, unsigned char key){
-	return g_get_pixel(input_buffer, key%(G_MEMORY_UNIT*input_buffer->striplen), 
-			key/(G_MEMORY_UNIT*input_buffer->striplen));
+	return g_get_pixel(input_buffer, key/(G_MEMORY_UNIT*input_buffer->striplen),
+		key%(G_MEMORY_UNIT*input_buffer->striplen));
 }
 
 
@@ -32,7 +32,7 @@ char * input_text(G_Surface * input_buffer, char * text, int cursor){
 
 			tmp[0] = str_shorten(tmp[0], 1);
 			text = str_concat(tmp[0], tmp[1]);
-			
+
 			input_set_key(input_buffer, i, 0);
 			return text;
 		}

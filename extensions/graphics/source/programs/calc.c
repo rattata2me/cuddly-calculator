@@ -5,7 +5,6 @@
 #include "graphics/ui.h"
 #include "mathinterpreter.h"
 
-
 G_Surface * s, * b;
 
 G_ScrollText * mathinput, * result;
@@ -176,13 +175,10 @@ void update_mathinput(G_Scene * scene){
 	timer++;
 }
 
-
 void calc_draw(void * v_scene){
 
 	G_Scene * scene = (G_Scene*)v_scene;
-
 	update_mathinput(scene);
-
 
 }
 
