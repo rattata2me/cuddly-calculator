@@ -18,15 +18,19 @@ char * functions[] = {
 	MI_FUN_SIN,
 	MI_FUN_MOD,
 	MI_FUN_POW,
-	MI_FUN_PI
+	MI_FUN_PI,
+	MI_FUN_X
 };
 const int functions_size[] = {
 	3,
 	3,
 	3,
 	3,
-	2
+	2,
+	1
 };
+
+float MI_X = 1.0f;
 
 char MI_USE_RADIANS = 0;
 
@@ -57,7 +61,6 @@ bool mathinterpreter_internal_is_op(char * character){
 }
 
 int8_t mathinterpreter_eval_char(char * character){
-
 	int8_t val = *character;
 	val = val - 0x30;  // Ascii number offset
 	return val;
@@ -115,7 +118,7 @@ int mathinterpreter_get_function_code(char * str, int startchar, int endchar){
 
 	mathinterpreterer_prepare_prediction(str, startchar, endchar);
 	for(int i = 0; i < MI_FUN_SIZE; i++){
-		if(!functions_search_bool[i] && startchar != endchar &&
+		if(!functions_search_bool[i] &&
 			endchar-startchar == functions_size[i]-1) code = i;
 		functions_search_bool[i] = 0;
 	}
@@ -150,7 +153,6 @@ Mi_Node * mathinterpreter_get_value_from_function(char * str, int startchar, int
 
 	if(endfun+2 == endchar || startchar == endchar){ // no arguments
 		args->size = 0;
-
 		return fun;
 	}
 
@@ -398,6 +400,16 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 						return powf(a,b);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 					break;
+
+				case 4: // Number pi
+					if(node->fun.args->size == 0){
+						return M_PI;
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+
+				case 5: // X
+					if(node->fun.args->size == 0){
+						return MI_X;
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 
 				default:
 					*error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid function name")->err;

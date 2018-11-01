@@ -33,12 +33,15 @@ extern const char hierarchy[MI_OP_SIZE];
 #define MI_FUN_POW "POW"
 #define MI_FUN_MOD "MOD"
 #define MI_FUN_PI "PI"
+#define MI_FUN_X "X"
 
-#define MI_FUN_SIZE 5
+#define MI_FUN_SIZE 6
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
 #endif
+
+extern float MI_X;
 extern char MI_USE_RADIANS;
 extern char * functions[MI_FUN_SIZE];
 extern const int functions_size[MI_FUN_SIZE]; // C...

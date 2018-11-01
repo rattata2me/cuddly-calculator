@@ -6,6 +6,11 @@
 #include "graphics/pixelsurface.h"
 #include "input.h"
 
+#include "bigfont.h"
+#include "smallfont.h"
+#include "graphics/ui.h"
+
+
 void calc_init(void * scene);
 
 void calc_draw(void * scene);

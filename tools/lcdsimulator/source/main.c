@@ -51,9 +51,9 @@ int init(){
 
 	program = malloc(sizeof(G_Scene));
 
-	program->init = &calc_init;
-	program->draw = &calc_draw;
-	program->clear = &calc_clear;
+	program->init = &graph_init;
+	program->draw = &graph_draw;
+	program->clear = &graph_clear;
 
 	buffer = g_create_surface(128, 64);
 

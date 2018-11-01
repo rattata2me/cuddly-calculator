@@ -1,8 +1,5 @@
 #include "programs/calc.h"
-#include "graphics/scene.h"
-#include "bigfont.h"
-#include "smallfont.h"
-#include "graphics/ui.h"
+
 #include "mathinterpreter.h"
 
 G_Surface * s, * b;
