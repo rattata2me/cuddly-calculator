@@ -86,9 +86,7 @@ void update_mathinput(G_Scene * scene){
 
 	if(mi_prev_len != mathinputlen){
 		scene->need_update = 1;
-
 		cursor += mathinputlen - mi_prev_len;
-
 	}
 
 	if(input_get_key(scene->input_buffer, I_LEFT)){
@@ -159,16 +157,20 @@ void update_mathinput(G_Scene * scene){
 	startpoint < 0 ? startpoint = 0 : 0;
 
 	mathinput->sx = -g_font_size(mathinput->font).x*startpoint;
-	// Draw everything
-	g_clear(scene->buffer);
-	g_draw_scrolltext(scene->buffer, mathinput);
-	if((timer/30 % 2) == 0)g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
-			vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
-	g_draw_scrolltext(scene->buffer, result);
-	if(functionlen > 0){
-		update_functionpredictor(scene);
+
+	if(timer % 50000 == 0) scene->need_update = 1;
+
+	if(scene->need_update){
+		// Draw everything
+		g_clear(scene->buffer);
+		g_draw_scrolltext(scene->buffer, mathinput);
+		if((timer/50000 % 2) == 0)g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
+				vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
+			g_draw_scrolltext(scene->buffer, result);
+		if(functionlen > 0){
+			update_functionpredictor(scene);
+		}
 	}
-	scene->need_update = 1;
 	timer++;
 }
 

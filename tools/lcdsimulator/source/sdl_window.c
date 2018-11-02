@@ -20,27 +20,27 @@ void sdl_clear(sdl_window * window, int r, int g, int b, int a){
 
 
 sdl_window * sdl_init_window(){
-	
+
 	sdl_window * window = malloc(sizeof(sdl_window));
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
 		printf("You should fix this soon, ERROR: %s\n", SDL_GetError());
 		return NULL;
 	}
-	
+
 	window->window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if(window->window == NULL){
-		printf("Could not create the desired SDL_Window, :-(, ERROR: %s\n", SDL_GetError());	
+		printf("Could not create the desired SDL_Window, :-(, ERROR: %s\n", SDL_GetError());
 		return NULL;
 	}
 
-	
+
 	window->renderer = SDL_CreateRenderer(window->window,  0, SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(window->renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 
 	if(window->renderer == NULL){
-		printf("Is this a computer or a toaster?, mmm, ERROR: %s\n", SDL_GetError());	
+		printf("Is this a computer or a toaster?, mmm, ERROR: %s\n", SDL_GetError());
 		return NULL;
 	}
 
@@ -87,11 +87,11 @@ bool sdl_loop(sdl_window * window, G_Scene * scene){
 	SDL_StartTextInput();
 	while(SDL_PollEvent(&e) != 0){
 			switch(e.type){
-				
+
 				case SDL_QUIT:
 					running = false;
 					break;
-				
+
 				case SDL_TEXTINPUT:
 					input_set_key(scene->input_buffer, e.text.text[0], 1);
 					break;
@@ -129,7 +129,10 @@ bool sdl_loop(sdl_window * window, G_Scene * scene){
 			}
 		}
 
-	sdl_render(window, scene);
+	if(scene->need_update){
+		sdl_render(window, scene);
+		scene->need_update = 0;
+	}
 	return running;
 
 }

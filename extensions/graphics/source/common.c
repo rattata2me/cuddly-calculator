@@ -16,7 +16,7 @@ int str_len(char * str){
 }
 
 char * str_new(char * str){
-	
+
 	int len = str_len(str);
 	char * result = malloc(sizeof(char)*(len+1));
 	memcpy(result, str, sizeof(char)*len);
@@ -27,7 +27,7 @@ char * str_new(char * str){
 }
 
 char * str_concat(char * a, char * b){
-	
+
 	int len_a = str_len(a);
 	int len_b = str_len(b);
 
@@ -54,7 +54,7 @@ char * str_append(char * a, unsigned char b){
 
 char * str_shorten(char * a, int amount){
 	int len = str_len(a);
-	if(len-amount >= 0){	
+	if(len-amount >= 0){
 		char * result = malloc(sizeof(char)*(len-amount+1));
 		memcpy(result, a, sizeof(char)*(len-amount));
 		result[len-amount] = '\0';
@@ -84,4 +84,10 @@ char ** str_divide(char * a, int cursor){
 	result[0] = r1;
 	result[1] = r2;
 	return result;
+}
+
+char * str_from_float(float value){
+	char * buf = str_new("");
+	sprintf (buf, "%f", (float)(value));
+	return buf;
 }

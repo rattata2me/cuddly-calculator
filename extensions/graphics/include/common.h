@@ -31,5 +31,6 @@ char ** str_divide(char * a, int cursor);
 
 unsigned char str_equal(char * a, char * b);
 
-#endif
+char * str_from_float(float value);
 
+#endif

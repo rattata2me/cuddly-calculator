@@ -5,7 +5,9 @@
 #include "input.h"
 
 #include "graphics/renderer.h"
+#include "graphics/texture.h"
 
+#include "graphics/ui.h"
 #include "graphics/scene.h"
 
 
