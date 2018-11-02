@@ -149,3 +149,42 @@ void g_destroy_scrolllist(G_ScrollList * scrolllist){
 	free(scrolllist);
 
 }
+
+void g_proccess_text_input(G_Scene * scene, G_ScrollText * scrolltext, int * cursor, int * startpoint){
+
+	char * ptext = scrolltext->text;
+	int prev_len = str_len(ptext);
+
+	scrolltext->text = input_text(scene->input_buffer, scrolltext->text, *cursor);
+
+	int scrolltextlen = str_len(scrolltext->text);
+
+	if(prev_len != scrolltextlen){
+		scene->need_update = 1;
+		*cursor += scrolltextlen - prev_len;
+	}
+
+	if(input_get_key(scene->input_buffer, I_LEFT)){
+		*cursor -=1;
+		input_set_key(scene->input_buffer, I_LEFT, 0);
+		scene->need_update = 1;
+	}
+
+	if(input_get_key(scene->input_buffer, I_RIGHT)){
+		*cursor +=1;
+		input_set_key(scene->input_buffer, I_RIGHT, 0);
+		scene->need_update = 1;
+	}
+
+	*cursor = *cursor > scrolltextlen ? 0 : *cursor;
+	*cursor = *cursor < 0 ? scrolltextlen : *cursor;
+
+	if(*cursor > (scrolltext->rect.width/g_font_size(scrolltext->font).x)+(*startpoint)-1)
+		(*startpoint) +=1;
+	if(*cursor <= *startpoint)
+		(*startpoint) -=1;
+	(*startpoint) < 0 ? (*startpoint) = 0 : 0;
+
+	scrolltext->sx = -g_font_size(scrolltext->font).x*(*startpoint);
+
+}

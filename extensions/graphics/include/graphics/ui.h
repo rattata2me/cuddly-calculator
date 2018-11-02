@@ -6,6 +6,8 @@
 #include "graphics/pixelsurface.h"
 #include "graphics/font.h"
 #include "graphics/renderer.h"
+#include "graphics/scene.h"
+#include "input.h"
 
 typedef struct{
 	int sx;
@@ -59,7 +61,7 @@ G_ScrollList * g_create_scrolllist(int size, G_Surface * font, Rect rect);
 void g_draw_scrolllist(G_Surface * surface, G_ScrollList * scrolllist);
 void g_destroy_scrolllist(G_ScrollList * scrolllist);
 
-
+void g_proccess_text_input(G_Scene * scene, G_ScrollText * scrolltext, int * cursor, int * startpoint);
 
 
 

@@ -397,6 +397,7 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 					if(node->fun.args->size == 2){
 						float a = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args), error);
 						float b = mathinterpreter_solve(*((Mi_Node**)node->fun.args->args+1), error);
+						if(b < 1.0f && a < 0) return 0.0f;
 						return powf(a,b);
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 					break;
@@ -449,6 +450,8 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 		case MI_POW:
 			a = mathinterpreter_solve(node->op.a, error);
 			b = mathinterpreter_solve(node->op.b, error);
+			if(b < 1.0f && a < 0) return 0.0f;
+
 			return powf(a, b);
 
 		default:
