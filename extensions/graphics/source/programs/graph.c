@@ -3,13 +3,14 @@
 #include "cursor.h"
 #include "smallfont.h"
 #include "bigfont.h"
+#include "optionsbutton.h"
 
 #define precision 16
 float values[precision];
 
 vec2 oaxis;
 
-G_Surface * s, * b, *cursors;
+G_Surface * s, * b, *cursors, *optsur;
 G_TextButton * infotab;
 G_ScrollText * mathinput, * enterfun;
 
@@ -25,6 +26,8 @@ void graph_init(void * v_scene){
 
 	b = g_create_surface_from_pixels(bigfont_width, bigfont_height, bigfont_pixels);
 	s = g_create_surface_from_pixels(smallfont_width, smallfont_height, smallfont_pixels);
+	optsur = g_create_surface_from_pixels(optionsbutton_width, optionsbutton_height, optionsbutton_pixels);
+
 
 	cursors = g_create_surface_from_pixels(cursor_width, cursor_height, cursor_pixels);
 	infotab = g_create_textbutton(s, rect_create(0,0,128,11));
@@ -144,7 +147,7 @@ void update_plane(G_Scene * scene){
 		infotab->text = str_concat(str_concat(str_concat(str_new("X:"),cx), str_new(" Y:")),
 		cy);
 		g_draw_textbutton(scene->buffer, infotab);
-
+		g_draw_surface(scene->buffer, optsur, vec2_create(-2, scene->buffer->height-14));
 
 	}
 
@@ -232,6 +235,7 @@ void graph_draw(void * v_scene){
 void graph_clear(void * v_scene){
 	g_destroy_surface(s);
 	g_destroy_surface(cursors);
+	g_destroy_surface(optsur);
 	g_destroy_textbutton(infotab);
 	g_destroy_scrolltext(mathinput);
 	g_destroy_scrolltext(enterfun);
