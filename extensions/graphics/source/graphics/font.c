@@ -23,5 +23,5 @@ void g_draw_word(G_Surface * canvas, G_Surface * bitmap, unsigned char letter, v
 }
 
 vec2 g_font_size(G_Surface * font){
-	return vec2_create(font->width/FONT_SIZE, font->height/FONT_SIZE);
+	return vec2_create(font->width/FONT_SIZE, font->height*2/FONT_SIZE);
 }

@@ -15,7 +15,7 @@ void g_draw_scrolltext(G_Surface * buffer, G_ScrollText * scrolltext){
 	if(scrolltext->autoscroll == 1){
 		scrolltext->sx += -1;
 	}
-	vec2 size = {scrolltext->font->width/FONT_SIZE, scrolltext->font->height/FONT_SIZE};
+	vec2 size = g_font_size(scrolltext->font);
 	int j = 0;
 	int lline = 0;
 	int line = 0;

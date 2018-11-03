@@ -21,6 +21,8 @@ G_ScrollList * options_list;
 
 void setoptionsscrollist(G_Scene * scene);
 
+void options_view(G_Scene * scene);
+
 unsigned char sceneset = 0;
 void graph_init(void * v_scene){
 
