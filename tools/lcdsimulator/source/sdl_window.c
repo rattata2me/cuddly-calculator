@@ -8,8 +8,8 @@ const int SCREEN_HEIGHT = 480;
 
 //Crappy values for now URGENT TODO update this.
 
-int padding = 1; // Pixels
-int pixel_size = 3;
+int padding = 0; // Pixels
+int pixel_size = 4;
 
 void sdl_clear(sdl_window * window, int r, int g, int b, int a){
 

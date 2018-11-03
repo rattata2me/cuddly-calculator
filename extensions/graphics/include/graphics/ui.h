@@ -53,6 +53,7 @@ typedef struct{
 	G_ScrollText ** list;
 	char ** text;
 	int size;
+	char sy;
 	Rect rect;
 
 } G_ScrollList;

@@ -20,7 +20,7 @@ G_Surface * input_create_buffer();
 
 void input_set_key(G_Surface * input_buffer, unsigned char key, char value);
 
-int input_get_key(G_Surface * input_buffer, unsigned char key);
+unsigned char input_get_key(G_Surface * input_buffer, unsigned char key);
 
 char * input_text(G_Surface * input_buffer, char * str, int cursor);
 

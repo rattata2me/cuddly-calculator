@@ -6,15 +6,17 @@
 #include "optionsbutton.h"
 #include "scalebutton.h"
 #include "movebutton.h"
+#include "returnbutton.h"
+#include "okbutton.h"
 
 #define precision 16
 float values[precision];
 
 vec2 oaxis;
 
-G_Surface * s, * b, *cursors, *optsur, *scalesur, *movesur;
+G_Surface * s, * b, *cursors, *optsur, *scalesur, *movesur, *returnsur, *oksur;
 G_TextButton * infotab;
-G_ScrollText * mathinput, * enterfun;
+G_ScrollText * mathinput, * enterfun, * enteroptions;
 
 G_ScrollList * options_list;
 
@@ -38,16 +40,18 @@ void graph_init(void * v_scene){
 	optsur = g_create_surface_from_pixels(optionsbutton_width, optionsbutton_height, optionsbutton_pixels);
 	scalesur = g_create_surface_from_pixels(scalebutton_width, scalebutton_height, scalebutton_pixels);
 	movesur = g_create_surface_from_pixels(movebutton_width, movebutton_height, movebutton_pixels);
-
+	returnsur = g_create_surface_from_pixels(returnbutton_width, returnbutton_height, returnbutton_pixels);
+	oksur = g_create_surface_from_pixels(okbutton_width, okbutton_height, okbutton_pixels);
 
 	cursors = g_create_surface_from_pixels(cursor_width, cursor_height, cursor_pixels);
-	infotab = g_create_textbutton(s, rect_create(0,0,128,11));
+	infotab = g_create_textbutton(s, rect_create(0,0,128,12));
 	mathinput = g_create_scrolltext(b, 2, rect_create(2,20,126,20));
 	enterfun = g_create_scrolltext(b, 0, rect_create(2,2,126,20));
 	enterfun->text = str_new("Enter the function:");
 
 	//Options
-	options_list = g_create_scrolllist(6, s, rect_create(0,0,128,50));
+	options_list = g_create_scrolllist(6, s, rect_create(-1,-1,130,50));
+	enteroptions = g_create_scrolltext(b, 2, rect_create(15, 50, 110, 14));
 
 }
 
@@ -205,7 +209,6 @@ void set_function(G_Scene * scene){
 
 		g_draw_scrolltext(scene->buffer, mathinput);
 		g_draw_scrolltext(scene->buffer, enterfun);
-		g_draw_surface(scene->buffer, optsur, vec2_create(-2, scene->buffer->height-14));
 	}
 
 	if(input_get_key(scene->input_buffer, I_ENTER)){
@@ -216,10 +219,10 @@ void set_function(G_Scene * scene){
 	}
 
 }
-
+int lop = 0;
 void setoptionsscrollist(G_Scene * scene){
-
-	for(int i = 0; i < 6; i++){
+	lop = options_list->rect.height/g_font_size(options_list->list[0]->font).y;
+	for(int i = 0; i < options_list->size; i++){
 		free(options_list->text[i]);
 		switch(i){
 			case 0:
@@ -234,18 +237,129 @@ void setoptionsscrollist(G_Scene * scene){
 			case 3:
 				options_list->text[i] = str_concat(str_new("Y Scale:  "), str_from_float(sy));
 				break;
+			case 4:
+				options_list->text[i] = str_new("Enter Function[Y/N]");
+				break;
 			default:
-				options_list->text[i] = str_new(" ");
+				options_list->text[i] = str_new(" x");
 				break;
 		}
 	}
 
 }
 
+int opy = 0;
+int ops = 0;
+unsigned char editing = 0;
+int cursoro = 0;
+int startpointo = 0;
 void options_view(G_Scene * scene){
 
+	if(editing) g_proccess_text_input(scene, enteroptions, &cursoro, &startpointo);
 
+	int opsl = ops;
+	int opyl = opy;
 
+	if(!editing){
+		if(input_get_key(scene->input_buffer, I_UP)){
+			ops--;
+			input_set_key(scene->input_buffer, I_UP, 0);
+			scene->need_update = 1;
+		}
+
+		if(input_get_key(scene->input_buffer, I_DOWN)){
+			ops++;
+			input_set_key(scene->input_buffer, I_DOWN, 0);
+			scene->need_update = 1;
+		}
+	}
+
+	ops = ops < 0 ? 0 : ops;
+	ops  = ops >= options_list->size ? options_list->size-1 : ops;
+	opy = ops > options_list->size-lop ? options_list->size-lop : ops;
+
+	if(opsl != ops) options_list->list[opsl-opyl]->sx = 0;
+
+	if(input_get_key(scene->input_buffer, I_ENTER)){
+		if(editing){
+			int len = str_len(enteroptions->text);
+			float val = 0.0f;
+			switch (ops) {
+				case 0:
+					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
+					px = val/sx;
+					break;
+				case 1:
+					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
+					py = val*sy;
+					break;
+				case 2:
+					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
+					sx = val;
+					break;
+				case 3:
+					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
+					sy = val;
+					break;
+				case 4:
+					printf("let's see...\n");
+					if(str_equal(enteroptions->text, "Y")){
+						printf("nice\n");
+					}
+					break;
+				default:
+					break;
+			}
+			editing = 0;
+		}else{
+			editing = 1;
+			enteroptions->text = str_new("");
+			cursoro = 0;
+			startpointo = 0;
+		}
+		input_set_key(scene->input_buffer, I_ENTER, 0);
+		scene->need_update = 1;
+	}
+
+	if((timer % 50000 == 0)){
+		scene->need_update = 1;
+		options_list->list[ops-opy]->sx -= 4;
+	}
+	timer++;
+
+	if(scene->need_update){
+		g_clear(scene->buffer);
+
+		setoptionsscrollist(scene);
+		options_list->sy = opy;
+		g_draw_scrolllist(scene->buffer, options_list);
+		g_invert_surface(scene->buffer, rect_create(0,g_font_size(options_list->list[0]->font).y*(ops-opy)-1, 128, g_font_size(options_list->list[0]->font).y));
+
+		if(editing){
+			if((timer/50000 % 2) == 0){
+				g_draw_line(scene->buffer, vec2_add(rect_pos(enteroptions->rect), (cursoro-startpointo)*g_font_size(enteroptions->font).x, 0),
+					vec2_add(rect_pos(enteroptions->rect), (cursoro-startpointo)*g_font_size(enteroptions->font).x, g_font_size(enteroptions->font).y), 1);
+			}
+			g_draw_scrolltext(scene->buffer, enteroptions);
+		}
+
+		g_draw_surface(scene->buffer, returnsur, vec2_create(-2, scene->buffer->height-14));
+		g_draw_surface(scene->buffer, oksur, vec2_create(-14+scene->buffer->width, scene->buffer->height-14));
+	}
+	if(input_get_key(scene->input_buffer, I_RETURN)){
+		if(!editing){
+			sceneset = 1;
+			opy = 0;
+			ops = 0;
+			input_set_key(scene->input_buffer, I_RETURN, 0);
+			scene->need_update = 1;
+			update_plane(scene);
+		}else{
+			editing = 0;
+			input_set_key(scene->input_buffer, I_RETURN, 0);
+		}
+
+	}
 }
 
 void graph_draw(void * v_scene){
@@ -263,7 +377,11 @@ void graph_clear(void * v_scene){
 	g_destroy_surface(optsur);
 	g_destroy_surface(movesur);
 	g_destroy_surface(scalesur);
+	g_destroy_surface(returnsur);
+	g_destroy_surface(oksur);
 	g_destroy_textbutton(infotab);
 	g_destroy_scrolltext(mathinput);
 	g_destroy_scrolltext(enterfun);
+	g_destroy_scrolllist(options_list);
+	g_destroy_scrolltext(enteroptions);
 }

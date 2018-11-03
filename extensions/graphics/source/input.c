@@ -10,15 +10,15 @@ void input_set_key(G_Surface * input_buffer, unsigned char key, char val){
 		key%(G_MEMORY_UNIT*input_buffer->striplen), val);
 }
 
-int input_get_key(G_Surface * input_buffer, unsigned char key){
+unsigned char input_get_key(G_Surface * input_buffer, unsigned char key){
 	return g_get_pixel(input_buffer, key/(G_MEMORY_UNIT*input_buffer->striplen),
 		key%(G_MEMORY_UNIT*input_buffer->striplen));
 }
 
 
 char * input_text(G_Surface * input_buffer, char * text, int cursor){
-	for(int i = 0; i < 256; i++){
-		if(input_get_key(input_buffer, i) && i > 31 && i < 127){
+	for(int i = 31; i < 127; i++){
+		if(input_get_key(input_buffer, i)){
 			char ** tmp =  str_divide(text, cursor);
 
 			tmp[0] = str_append(tmp[0], i);
@@ -27,15 +27,15 @@ char * input_text(G_Surface * input_buffer, char * text, int cursor){
 			input_set_key(input_buffer, i, 0);
 			return text;
 		}
-		if(i == I_DEL && input_get_key(input_buffer, i)){
-			char ** tmp = str_divide(text, cursor);
+	}
+	if(input_get_key(input_buffer, I_DEL)){
+		char ** tmp = str_divide(text, cursor);
 
-			tmp[0] = str_shorten(tmp[0], 1);
-			text = str_concat(tmp[0], tmp[1]);
+		tmp[0] = str_shorten(tmp[0], 1);
+		text = str_concat(tmp[0], tmp[1]);
 
-			input_set_key(input_buffer, i, 0);
-			return text;
-		}
+		input_set_key(input_buffer, I_DEL, 0);
+		return text;
 	}
 	return text;
 }
