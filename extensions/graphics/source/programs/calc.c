@@ -129,7 +129,7 @@ void update_mathinput(G_Scene * scene){
 		if(functionlen < 1){
 			Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 			float res = mathinterpreter_eval(mathinput->text,  mathinputlen, &error);
-			gcvt(res, 5, result->text);
+			result->text = str_from_float(res);
 			if(error.code == MI_ERROR_NONE)
 				 result->text = str_concat(str_new("="), result->text);
 			else result->text = str_new("Error");

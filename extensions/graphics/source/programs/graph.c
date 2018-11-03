@@ -70,6 +70,7 @@ void update_graph_values(G_Scene * scene){
 		MI_X = (float)(j+px)*sx;
 		Mi_Err_Node error = mathinterpreter_error(MI_ERROR_NONE, "")->err;
 		float res = mathinterpreter_eval(mathinput->text,  str_len(mathinput->text), &error);
+		if(res >= 1000) res = 1000;
 		values[i] = res;
 		j+=n;
 	}
@@ -131,6 +132,15 @@ void update_plane(G_Scene * scene){
 			scene->need_update = 1;
 		}
 	}
+	px = px > 1000 ? 1000 :  px;
+	px = px < -1000 ? -1000 : px;
+	py = py > 1000 ? 1000 :  py;
+	py = py < -1000 ? -1000 : py;
+
+	sx = sx > 100 ? 100 :  sx;
+	sx = sx < 0.002f ? 0.002f : sx;
+	sy = sy > 100 ? 100 :  sy;
+	sy = sy < 0.002f ? 0.002f : sy;
 
 	if(scene->need_update == 1){
 
@@ -150,6 +160,7 @@ void update_plane(G_Scene * scene){
 		int j = 0;
 		for(int x = 0; x < precision-1; x++){
 			g_draw_line(scene->buffer, vec2_create(j, -values[x]*sy+32+py), vec2_create(j+n, -values[x+1]*sy+32+py), 1);
+			printf("Sx %f, px %i, mix %f, i %i, value %f\n", sx, px, MI_X, x, values[x]);
 			j+=n;
 		}
 
@@ -238,7 +249,7 @@ void setoptionsscrollist(G_Scene * scene){
 				options_list->text[i] = str_concat(str_new("Y Scale:  "), str_from_float(sy));
 				break;
 			case 4:
-				options_list->text[i] = str_new("Enter Function[Y/N]");
+				options_list->text[i] = str_new("Retype function[Y/N]");
 				break;
 			default:
 				options_list->text[i] = str_new(" x");
@@ -301,11 +312,15 @@ void options_view(G_Scene * scene){
 					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
 					sy = val;
 					break;
-				case 4:
-					printf("let's see...\n");
-					if(str_equal(enteroptions->text, "Y")){
-						printf("nice\n");
+				case 4:;
+					char * e = str_new("y");
+					if(str_equal(enteroptions->text, e)){
+						cursor = 0;
+						startpoint = 0;
+						mathinput->text = str_new("");
+						sceneset = 0;
 					}
+					free(e);
 					break;
 				default:
 					break;
