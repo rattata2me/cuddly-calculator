@@ -10,6 +10,7 @@
 #include "graphics/ui.h"
 #include "programs/calc.h"
 #include "programs/graph.h"
+#include "programs/menu.h"
 
 #ifdef SDL_SIM
 	#include "sdl_window.h"
@@ -35,6 +36,40 @@ int esw = 128;
 
 G_Scene * program;
 
+void init_program(){
+	switch(program->programid){
+		case 0:
+			menu_init(program);
+			break;
+		case 1:
+			calc_init(program);
+			break;
+		case 2:
+			graph_init(program);
+			break;
+		default:
+			menu_init(program);
+			break;
+	}
+}
+
+void draw_program(){
+	switch(program->programid){
+		case 0:
+			menu_draw(program);
+			break;
+		case 1:
+			calc_draw(program);
+			break;
+		case 2:
+			graph_draw(program);
+			break;
+		default:
+			menu_draw(program);
+			break;
+	}
+}
+
 int init(){
 
 	#ifdef SDL_SIM
@@ -51,23 +86,25 @@ int init(){
 
 	program = malloc(sizeof(G_Scene));
 
-	program->init = &graph_init;
-	program->draw = &graph_draw;
-	program->clear = &graph_clear;
-
 	buffer = g_create_surface(128, 64);
+
+
 
 	program->need_update = 0;
 	program->buffer = buffer;
 
-	(*program->init)(program);
+	program->programid = 0;
 
 	return 0;
 }
 
+char lastprogramid = -1;
 void render(){
-
-	(*program->draw)(program);
+	if(lastprogramid != program->programid){
+		init_program(program);
+		lastprogramid = program->programid;
+	}
+	draw_program();
 
 }
 

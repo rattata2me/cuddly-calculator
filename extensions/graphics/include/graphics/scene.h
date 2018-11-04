@@ -5,14 +5,17 @@
 
 typedef struct
 {
-	void (*init)(void * scene);
-	void (*draw)(void * scene);
-	void (*clear)(void * scene);
 
+	char programid;
 	char need_update;
 	G_Surface * buffer;
 	G_Surface * input_buffer;
 
 } G_Scene;
+
+#define PROGRAM_MENU 0
+#define PROGRAM_CALC 1
+#define PROGRAM_GRAPH 2
+
 
 #endif

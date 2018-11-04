@@ -87,7 +87,7 @@ char ** str_divide(char * a, int cursor){
 }
 
 char * str_from_float(float value){
-	char * buf = str_new("");
+  char buf[20];
 	sprintf (buf, "%f", (float)(value));
-	return buf;
+	return str_new(buf);
 }

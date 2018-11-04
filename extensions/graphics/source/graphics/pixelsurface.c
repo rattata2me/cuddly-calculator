@@ -16,6 +16,7 @@ G_Surface * g_create_surface(unsigned int width, unsigned int height){
 	surface->width = width;
 	surface->striplen = ncol;
 	surface->height = height+1;
+	surface->is_static = 0;
 	surface->pixels = (unsigned char *) calloc(ncol*width, (G_MEMORY_UNIT/8));
 
 	return surface;
@@ -23,7 +24,7 @@ G_Surface * g_create_surface(unsigned int width, unsigned int height){
 
 void g_destroy_surface(G_Surface * surface){
 
-	free(surface->pixels);
+	if(!surface->is_static)free(surface->pixels);
 	free(surface);
 
 }

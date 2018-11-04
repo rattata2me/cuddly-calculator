@@ -15,7 +15,7 @@ MI_INCLUDE = ../mathinterpreter/include
 CFLAGS = -I$(INCLUDE_DIRECTORY) -I$(IMAGES_DIRECTORY) -I$(MI_INCLUDE) -g -Wall -Werror -pedantic -std=gnu11
 
 _OBJECT_FILES = common.o graphics/pixelsurface.o graphics/renderer.o input.o math/vec2.o math/vec3.o math/mat3x3.o graphics/texture.o graphics/font.o
-_OBJECT_FILES += math/rect.o graphics/ui.o programs/calc.o programs/graph.o
+_OBJECT_FILES += math/rect.o graphics/ui.o programs/calc.o programs/graph.o programs/menu.o
 
 OBJ = $(patsubst %,$(BUILD_DIRECTORY)/%,$(_OBJECT_FILES))
 

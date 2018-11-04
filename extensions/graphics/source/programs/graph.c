@@ -27,7 +27,6 @@ void options_view(G_Scene * scene);
 
 unsigned char sceneset = 0;
 void graph_init(void * v_scene){
-
 	G_Scene * scene = (G_Scene*)v_scene;
 	scene->input_buffer = input_create_buffer();
 
@@ -59,7 +58,7 @@ int px = 1;
 int py = 0;
 float sx = 0.25f;
 float sy = 0.25f;
-int n;
+int n = 0;
 
 void update_graph_values(G_Scene * scene){
 
@@ -160,7 +159,6 @@ void update_plane(G_Scene * scene){
 		int j = 0;
 		for(int x = 0; x < precision-1; x++){
 			g_draw_line(scene->buffer, vec2_create(j, -values[x]*sy+32+py), vec2_create(j+n, -values[x+1]*sy+32+py), 1);
-			printf("Sx %f, px %i, mix %f, i %i, value %f\n", sx, px, MI_X, x, values[x]);
 			j+=n;
 		}
 
@@ -192,30 +190,30 @@ void update_plane(G_Scene * scene){
 }
 
 
-int cursor = 0;
-int startpoint = 0;
+int cursorr = 0;
+int startpointr = 0;
 
-unsigned int timer = 0;
+unsigned int timerr = 0;
 
 void set_function(G_Scene * scene){
 
 
-	g_proccess_text_input(scene, mathinput, &cursor, &startpoint);
+	g_proccess_text_input(scene, mathinput, &cursorr, &startpointr);
 
 
-	if(timer % 50000 == 0){
+	if(timerr % 50000 == 0){
 		scene->need_update = 1;
 		enterfun->sx -= 8;
 	}
-	timer++;
+	timerr++;
 
 	if(scene->need_update){
 
 		g_clear(scene->buffer);
 
-		if((timer/50000 % 2) == 0){
-			g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
-				vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
+		if((timerr/50000 % 2) == 0){
+			g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursorr-startpointr)*g_font_size(mathinput->font).x, 0),
+				vec2_add(rect_pos(mathinput->rect), (cursorr-startpointr)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
 		}
 
 		g_draw_scrolltext(scene->buffer, mathinput);
@@ -315,8 +313,8 @@ void options_view(G_Scene * scene){
 				case 4:;
 					char * e = str_new("y");
 					if(str_equal(enteroptions->text, e)){
-						cursor = 0;
-						startpoint = 0;
+						cursorr = 0;
+						startpointr = 0;
 						mathinput->text = str_new("");
 						sceneset = 0;
 					}
@@ -336,11 +334,11 @@ void options_view(G_Scene * scene){
 		scene->need_update = 1;
 	}
 
-	if((timer % 50000 == 0)){
+	if((timerr % 50000 == 0)){
 		scene->need_update = 1;
 		options_list->list[ops-opy]->sx -= 4;
 	}
-	timer++;
+	timerr++;
 
 	if(scene->need_update){
 		g_clear(scene->buffer);
@@ -351,7 +349,7 @@ void options_view(G_Scene * scene){
 		g_invert_surface(scene->buffer, rect_create(0,g_font_size(options_list->list[0]->font).y*(ops-opy)-1, 128, g_font_size(options_list->list[0]->font).y));
 
 		if(editing){
-			if((timer/50000 % 2) == 0){
+			if((timerr/50000 % 2) == 0){
 				g_draw_line(scene->buffer, vec2_add(rect_pos(enteroptions->rect), (cursoro-startpointo)*g_font_size(enteroptions->font).x, 0),
 					vec2_add(rect_pos(enteroptions->rect), (cursoro-startpointo)*g_font_size(enteroptions->font).x, g_font_size(enteroptions->font).y), 1);
 			}
@@ -383,9 +381,20 @@ void graph_draw(void * v_scene){
 	if(sceneset == 1)update_plane(scene);
 	else if(sceneset == 2) options_view(scene);
 	else set_function(scene);
+
+	if(input_get_key(scene->input_buffer, I_MENU)){
+
+    scene->programid = PROGRAM_MENU;
+    graph_clear(v_scene);
+    scene->need_update = 1;
+
+    input_set_key(scene->input_buffer, I_MENU, 0);
+  }
+
 }
 
 void graph_clear(void * v_scene){
+
 	g_destroy_surface(s);
 	g_destroy_surface(b);
 	g_destroy_surface(cursors);
@@ -399,4 +408,23 @@ void graph_clear(void * v_scene){
 	g_destroy_scrolltext(enterfun);
 	g_destroy_scrolllist(options_list);
 	g_destroy_scrolltext(enteroptions);
+
+	opy = 0;
+	ops = 0;
+	editing = 0;
+	cursoro = 0;
+	startpointo = 0;
+	lop = 0;
+	cursorr = 0;
+	startpointr = 0;
+	splane = 0;
+	sceneset = 0;
+	timerr = 0;
+	n = 0;
+	px = 1;
+	py = 0;
+	sx = 0.25f;
+	sy = 0.25f;
+
+
 }

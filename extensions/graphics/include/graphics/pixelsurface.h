@@ -13,6 +13,7 @@ typedef struct{
 	unsigned int width;
 	int striplen;
 	unsigned int height;
+	unsigned char is_static;
 	unsigned char * pixels;
 
 } G_Surface;

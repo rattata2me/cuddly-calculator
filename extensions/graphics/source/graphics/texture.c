@@ -12,6 +12,7 @@ G_Surface * g_create_surface_from_pixels(unsigned int width, unsigned int height
 	surface->width = width;
 	surface->striplen = ncol;
 	surface->height = height;
+	surface->is_static = 1;
 	surface->pixels = pixels;
 
 	return surface;
