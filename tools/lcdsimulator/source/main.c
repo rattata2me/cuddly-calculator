@@ -93,7 +93,7 @@ int init(){
 	program->need_update = 0;
 	program->buffer = buffer;
 
-	program->programid = 0;
+	program->programid = PROGRAM_MENU;
 
 	return 0;
 }
@@ -101,7 +101,7 @@ int init(){
 char lastprogramid = -1;
 void render(){
 	if(lastprogramid != program->programid){
-		init_program(program);
+		init_program();
 		lastprogramid = program->programid;
 	}
 	draw_program();

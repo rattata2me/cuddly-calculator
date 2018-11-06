@@ -11,7 +11,7 @@ typedef struct{
 
 #define n_entries 2
 
-Program_entry entries[2];
+Program_entry entries[n_entries];
 
 G_Surface * b;
 

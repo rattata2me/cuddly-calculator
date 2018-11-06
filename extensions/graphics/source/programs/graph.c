@@ -46,11 +46,12 @@ void graph_init(void * v_scene){
 	infotab = g_create_textbutton(s, rect_create(0,0,128,12));
 	mathinput = g_create_scrolltext(b, 2, rect_create(2,20,126,20));
 	enterfun = g_create_scrolltext(b, 0, rect_create(2,2,126,20));
+	free(enterfun->text);
 	enterfun->text = str_new("Enter the function:");
 
 	//Options
-	options_list = g_create_scrolllist(6, s, rect_create(-1,-1,130,50));
 	enteroptions = g_create_scrolltext(b, 2, rect_create(15, 50, 110, 14));
+	options_list = g_create_scrolllist(6, s, rect_create(-1,-1,130,50));
 
 }
 
@@ -326,6 +327,7 @@ void options_view(G_Scene * scene){
 			editing = 0;
 		}else{
 			editing = 1;
+			free(enteroptions->text);
 			enteroptions->text = str_new("");
 			cursoro = 0;
 			startpointo = 0;
@@ -382,8 +384,7 @@ void graph_draw(void * v_scene){
 	else if(sceneset == 2) options_view(scene);
 	else set_function(scene);
 
-	if(input_get_key(scene->input_buffer, I_MENU)){
-
+	if (input_get_key(scene->input_buffer, I_MENU)){
     scene->programid = PROGRAM_MENU;
     graph_clear(v_scene);
     scene->need_update = 1;
@@ -395,6 +396,11 @@ void graph_draw(void * v_scene){
 
 void graph_clear(void * v_scene){
 
+	g_destroy_scrolllist(options_list);
+	g_destroy_textbutton(infotab);
+	g_destroy_scrolltext(mathinput);
+	g_destroy_scrolltext(enterfun);
+	g_destroy_scrolltext(enteroptions);
 	g_destroy_surface(s);
 	g_destroy_surface(b);
 	g_destroy_surface(cursors);
@@ -403,11 +409,7 @@ void graph_clear(void * v_scene){
 	g_destroy_surface(scalesur);
 	g_destroy_surface(returnsur);
 	g_destroy_surface(oksur);
-	g_destroy_textbutton(infotab);
-	g_destroy_scrolltext(mathinput);
-	g_destroy_scrolltext(enterfun);
-	g_destroy_scrolllist(options_list);
-	g_destroy_scrolltext(enteroptions);
+
 
 	opy = 0;
 	ops = 0;

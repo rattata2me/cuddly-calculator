@@ -118,11 +118,12 @@ G_ScrollList * g_create_scrolllist(int size, G_Surface * font, Rect rect){
 	scrolllist->size = size;
 	scrolllist->rect = rect;
 	int sizey = g_font_size(font).y;
-	scrolllist->list = malloc(sizeof(G_ScrollText*)*(rect.height/sizey));
-	scrolllist->text = malloc(sizeof(char*)*size);
+	scrolllist->sizes = (rect.height/sizey);
+	scrolllist->text = malloc(size * sizeof(char*));
+	scrolllist->list = malloc(scrolllist->sizes * sizeof(G_ScrollText*));
 	for(int i = 0; i < size; i++){
 		scrolllist->text[i] = str_new("");
-		if(i < rect.height/sizey) scrolllist->list[i] = g_create_scrolltext(font, 0, rect_create(rect.x+1, rect.y+sizey*i, rect.width-1, sizey));
+		if(i < scrolllist->sizes) scrolllist->list[i] = g_create_scrolltext(font, 0, rect_create(rect.x+1, rect.y+sizey*i, rect.width-1, sizey));
 	}
 	return scrolllist;
 
@@ -132,7 +133,7 @@ void g_draw_scrolllist(G_Surface * surface, G_ScrollList * scrolllist){
 	g_fill_rect(surface, scrolllist->rect, 0);
 	g_draw_rect(surface, scrolllist->rect, 1);
 	scrolllist->sy = scrolllist->sy < 0 ? 0 : scrolllist->sy;
-	for(int i = 0; (i < scrolllist->rect.height/g_font_size(scrolllist->list[0]->font).y) &&
+	for(int i = 0; (i < scrolllist->sizes) &&
 	(i+scrolllist->sy < scrolllist->size); i++){
 		free(scrolllist->list[i]->text);
 		scrolllist->list[i]->text = str_new(scrolllist->text[i+scrolllist->sy]);
@@ -144,7 +145,7 @@ void g_destroy_scrolllist(G_ScrollList * scrolllist){
 
 	for(int i = 0; i < scrolllist->size; i++){
 		free(scrolllist->text[i]);
-		if(i < scrolllist->rect.height/g_font_size(scrolllist->list[0]->font).y) g_destroy_scrolltext(scrolllist->list[i]);
+		if(i < scrolllist->sizes) g_destroy_scrolltext(scrolllist->list[i]);
 	}
 	free(scrolllist->text);
 	free(scrolllist->list);
