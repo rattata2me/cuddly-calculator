@@ -104,7 +104,7 @@ char * mathinterpreterer_prepare_prediction(char * str, int startchar, int endch
 	for(int i = startchar; i <= endchar; i++){
 		for(int j = 0; j < MI_FUN_SIZE; j++){
 			if(functions_size[j] > (i-startchar)){
-				if(functions[j][i-startchar] != (str[i]&0x5f)) functions_search_bool[j] = 1;
+				if(functions[j][i-startchar] != (str[i] | 0x20)) functions_search_bool[j] = 1;
 			}else functions_search_bool[j] = 1;
 		}
 	}

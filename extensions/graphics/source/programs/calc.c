@@ -179,12 +179,23 @@ void calc_draw(void * v_scene){
 	G_Scene * scene = (G_Scene*)v_scene;
 	update_mathinput(scene);
 
+	if (input_get_key(scene->input_buffer, I_MENU)){
+    	scene->programid = PROGRAM_MENU;
+    	calc_clear(v_scene);
+    	scene->need_update = 1;
+
+    	input_set_key(scene->input_buffer, I_MENU, 0);
+  	}
+
 }
 
 
 void calc_clear(void * v_scene){
 
 	G_Scene * scene = (G_Scene*)v_scene;
+	g_destroy_scrolltext(mathinput);
+	g_destroy_scrolltext(result);
+	g_destroy_scrolllist(predictor_list);
 	g_destroy_surface(scene->input_buffer);
 	g_destroy_surface(s);
 	g_destroy_surface(b);

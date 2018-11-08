@@ -385,12 +385,12 @@ void graph_draw(void * v_scene){
 	else set_function(scene);
 
 	if (input_get_key(scene->input_buffer, I_MENU)){
-    scene->programid = PROGRAM_MENU;
-    graph_clear(v_scene);
-    scene->need_update = 1;
+    	scene->programid = PROGRAM_MENU;
+    	graph_clear(v_scene);
+    	scene->need_update = 1;
 
-    input_set_key(scene->input_buffer, I_MENU, 0);
-  }
+    	input_set_key(scene->input_buffer, I_MENU, 0);
+  	}
 
 }
 
