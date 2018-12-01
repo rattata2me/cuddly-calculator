@@ -14,6 +14,7 @@ G_ScrollList * predictor_list, * options_list;
 
 int cursor = 0;
 int ycursor = 0;
+int ycursors = 0; 
 int startpoint = 0;
 int functionlen = 0;
 
@@ -37,50 +38,67 @@ void calc_init(void * v_scene){
 	optsur = g_create_surface_from_pixels(optionsbutton_width, optionsbutton_height, optionsbutton_pixels);
 
 	mathinput = g_create_scrolltext(b, 2, rect_create(2,2,126,20));
-	result = g_create_scrolltext(b, 2, rect_create(2, 40, 126, 20));
-	predictor_list = g_create_scrolllist(6, s, rect_create(0,22,120,36));
+	result = g_create_scrolltext(b, 2, rect_create(2, 30, 126, 20));
+	predictor_list = g_create_scrolllist(MI_FUN_SIZE, s, rect_create(0,22,120,36));
 
 	//Options
 	enteroptions = g_create_scrolltext(b, 2, rect_create(15, 50, 110, 14));
 	options_list = g_create_scrolllist(6, s, rect_create(-1,-1,130,50));
 
 }
-
+char done = 0;
 void update_functionpredictor(G_Scene * scene){
 
-	int start = cursor-functionlen;
-	start = start < 0 ? 0 : start;
+	if(functionlen > 0){
 
-	mathinterpreterer_prepare_prediction(mathinput->text, start, cursor-1);
-	int j = 0;
-	for(int i = 0; i < MI_FUN_SIZE; i++){
-		if(!functions_search_bool[i] && j < predictor_list->size){
-			free(predictor_list->text[j]);
-			predictor_list->text[j] = str_new(functions[i]);
-			j++;
+		if(!done)
+			scene->need_update = 1;
+		done = 1;
+		int start = cursor-functionlen;
+		start = start < 0 ? 0 : start;
+
+		mathinterpreterer_prepare_prediction(mathinput->text, start, cursor-1);
+		int j = 0;
+		for(int i = 0; i < MI_FUN_SIZE; i++){
+			if(!functions_search_bool[i] && j < predictor_list->size){
+				free(predictor_list->text[j]);
+				predictor_list->text[j] = str_new(functions[i]);
+				j++;
+			}
+		}
+
+		if(input_get_key(scene->input_buffer, I_UP)){
+			ycursor --;
+			input_set_key(scene->input_buffer, I_UP, 0);
+			scene->need_update = 1;
+		}
+
+		if(input_get_key(scene->input_buffer, I_DOWN)){
+			ycursor ++;
+			input_set_key(scene->input_buffer, I_DOWN, 0);
+			scene->need_update = 1;
+		}
+		if(scene->need_update){
+			g_draw_scrolllist(scene->buffer, predictor_list);
+			for(int i = 0; i < predictor_list->size; i++){
+				if(i < predictor_list->sizes){
+					if(ycursor == i) g_invert_surface(scene->buffer, predictor_list->list[i]->rect);
+				}
+				free(predictor_list->text[i]);
+				predictor_list->text[i] = str_new("");
+			}
+		}
+
+		if(ycursor < 0){
+			predictor_list->sy --;
+			ycursor = 0;
+		}
+		if(ycursor >= predictor_list->sizes){
+			predictor_list->sy ++;
+			ycursor = predictor_list->sizes-1;
 		}
 	}
 
-	g_draw_scrolllist(scene->buffer, predictor_list);
-	for(int i = 0; i < predictor_list->size; i++){
-		if(ycursor == i) g_invert_surface(scene->buffer, predictor_list->list[i]->rect);
-		free(predictor_list->text[i]);
-		predictor_list->text[i] = str_new("");
-	}
-
-	if(input_get_key(scene->input_buffer, I_UP)){
-		ycursor --;
-		input_set_key(scene->input_buffer, I_UP, 0);
-		scene->need_update = 1;
-	}
-
-	if(input_get_key(scene->input_buffer, I_DOWN)){
-		ycursor ++;
-		input_set_key(scene->input_buffer, I_DOWN, 0);
-		scene->need_update = 1;
-	}
-	ycursor = ycursor < 0 ? predictor_list->rect.height/g_font_size(predictor_list->list[0]->font).y-1 : ycursor;
-	ycursor = ycursor >= predictor_list->rect.height/g_font_size(predictor_list->list[0]->font).y ? 0 : ycursor;
 
 }
 
@@ -126,7 +144,7 @@ void update_mathinput(G_Scene * scene){
 	// FUNCTION "PREDICTION"
 	int nlen = str_len(mathinput->text);
 	if(mi_prev_len != nlen && cursor-1 >= 0){
-		if((mathinput->text[cursor-1]&0x5f) >= 67 && (mathinput->text[cursor-1]&0x5f) <= 90){
+		if((mathinput->text[cursor-1]&0x5f) >= 65 && (mathinput->text[cursor-1]&0x5f) <= 90){
 			functionlen += nlen - mi_prev_len;
 			functionlen = functionlen < 0 ? 0 : functionlen;
 			ycursor = 0;
@@ -150,6 +168,7 @@ void update_mathinput(G_Scene * scene){
 			cursor += str_len(predictor_list->list[ycursor]->text);
 			mathinputlen += str_len(predictor_list->list[ycursor]->text);
 			functionlen = 0;
+			done = 0;
 		}
 		input_set_key(scene->input_buffer, I_ENTER, 0);
 		scene->need_update = 1;
@@ -176,11 +195,11 @@ void update_mathinput(G_Scene * scene){
 		if((timer/50000 % 2) == 0)g_draw_line(scene->buffer, vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, 0),
 				vec2_add(rect_pos(mathinput->rect), (cursor-startpoint)*g_font_size(mathinput->font).x, g_font_size(mathinput->font).y), 1);
 			g_draw_scrolltext(scene->buffer, result);
-		if(functionlen > 0){
-			update_functionpredictor(scene);
-		}
 		g_draw_surface(scene->buffer, optsur, vec2_create(-2, scene->buffer->height-14));
 	}
+
+	update_functionpredictor(scene);
+
 	timer++;
 
 	if(input_get_key(scene->input_buffer, I_RETURN)){
@@ -202,16 +221,16 @@ void setoptionsscrollistc(G_Scene * scene){
 		free(options_list->text[i]);
 		switch(i){
 			case 0:
-				options_list->text[i] = str_new("Set x's value");
-				break;
-			case 1:
 				options_list->text[i] = str_new("Use radians[Y/N]");
 				break;
+			case 1:
+				options_list->text[i] = str_new("Set x's value");
+				break;
 			case 2:
-				options_list->text[i] = str_new("**");
+				options_list->text[i] = str_new("Set A's value");
 				break;
 			case 3:
-				options_list->text[i] = str_new("***");
+				options_list->text[i] = str_new("Set B's value");
 				break;
 			case 4:
 				options_list->text[i] = str_new("****");
@@ -258,38 +277,25 @@ void options_viewc(G_Scene * scene){
 
 	if(input_get_key(scene->input_buffer, I_ENTER)){
 		if(editingc){
-			/*int len = str_len(enteroptions->text);
+			int len = str_len(enteroptions->text);
 			float val = 0.0f;
 			switch (opsc) {
-				case 0:
-					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
-					px = val/sx;
-					break;
-				case 1:
-					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
-					py = val*sy;
-					break;
-				case 2:
-					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
-					sx = val;
-					break;
-				case 3:
-					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
-					sy = val;
-					break;
-				case 4:;
+				case 0:;
 					char * e = str_new("y");
 					if(str_equal(enteroptions->text, e)){
-						cursorr = 0;
-						startpointr = 0;
-						mathinput->text = str_new("");
-						scenesetc = 0;
+						MI_USE_RADIANS = 1; 
+					}else{
+						MI_USE_RADIANS = 0;
 					}
 					free(e);
 					break;
+				case 1:
+					val = mathinterpreter_get_value_from_str(enteroptions->text, 0, len-1);
+					MI_X = val;
+					break;
 				default:
 					break;
-			}*/
+			}
 			editingc = 0;
 		}else{
 			editingc = 1;
@@ -387,7 +393,9 @@ void calc_clear(void * v_scene){
 	lopc = 0;
 	cursor = 0;
 	ycursor = 0;
+	ycursors = 0;
 	startpoint = 0;
 	functionlen = 0;
+	done = 0;
 
 }

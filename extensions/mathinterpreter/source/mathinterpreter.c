@@ -19,7 +19,8 @@ char * functions[] = {
 	MI_FUN_MOD,
 	MI_FUN_POW,
 	MI_FUN_PI,
-	MI_FUN_X
+	MI_FUN_X,
+	MI_FUN_ANS
 };
 const int functions_size[] = {
 	3,
@@ -27,10 +28,13 @@ const int functions_size[] = {
 	3,
 	3,
 	2,
-	1
+	1,
+	3
 };
 
 float MI_X = 1.0f;
+
+float MI_ANS = 0.0f;
 
 char MI_USE_RADIANS = 0;
 
@@ -412,6 +416,11 @@ float mathinterpreter_solve(Mi_Node * node, Mi_Err_Node * error){
 						return MI_X;
 					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
 
+				case 6:
+					if(node->fun.args->size == 0){
+						return MI_ANS;
+					}else *error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid args")->err;
+
 				default:
 					*error = mathinterpreter_error(MI_ERROR_SYNTAX, "Invalid function name")->err;
 					return 1.0f;
@@ -489,6 +498,8 @@ float mathinterpreter_eval(char * equation, int len, Mi_Err_Node * error){
 
 	float r = mathinterpreter_solve(node, error);
 	mathinterpreter_free(node);
+
+	if(error->code == MI_ERROR_NONE) MI_ANS = r;
 
 	return r;
 }

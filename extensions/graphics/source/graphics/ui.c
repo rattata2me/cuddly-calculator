@@ -133,8 +133,9 @@ void g_draw_scrolllist(G_Surface * surface, G_ScrollList * scrolllist){
 	g_fill_rect(surface, scrolllist->rect, 0);
 	g_draw_rect(surface, scrolllist->rect, 1);
 	scrolllist->sy = scrolllist->sy < 0 ? 0 : scrolllist->sy;
-	for(int i = 0; (i < scrolllist->sizes) &&
-	(i+scrolllist->sy < scrolllist->size); i++){
+	scrolllist->sy = scrolllist->sy > scrolllist->size-scrolllist->sizes ? 
+		scrolllist->size-scrolllist->sizes : scrolllist->sy;
+	for(int i = 0; (i < scrolllist->sizes); i++){
 		free(scrolllist->list[i]->text);
 		scrolllist->list[i]->text = str_new(scrolllist->text[i+scrolllist->sy]);
 		g_draw_scrolltext(surface, scrolllist->list[i]);

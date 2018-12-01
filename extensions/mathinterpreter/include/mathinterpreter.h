@@ -34,8 +34,9 @@ extern const char hierarchy[MI_OP_SIZE];
 #define MI_FUN_MOD "mod"
 #define MI_FUN_PI "pi"
 #define MI_FUN_X "x"
+#define MI_FUN_ANS "ans"
 
-#define MI_FUN_SIZE 6
+#define MI_FUN_SIZE 7
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327

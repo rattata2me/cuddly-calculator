@@ -1,6 +1,7 @@
 #include "programs/menu.h"
 
 #include "graphicon.h"
+#include "calcuicon.h"
 #include "bigfont.h"
 
 typedef struct{
@@ -24,7 +25,7 @@ void menu_init(void * v_scene){
 
   scene->need_update = 1;
 
-  entries[0] = (Program_entry) {g_create_surface_from_pixels(graphicon_width, graphicon_height, graphicon_pixels), str_new("Calculator"), PROGRAM_CALC};
+  entries[0] = (Program_entry) {g_create_surface_from_pixels(calcuicon_width, calcuicon_height, calcuicon_pixels), str_new("Calculator"), PROGRAM_CALC};
   entries[1] = (Program_entry) {g_create_surface_from_pixels(graphicon_width, graphicon_height, graphicon_pixels), str_new("Graph"), PROGRAM_GRAPH};
 
   b = g_create_surface_from_pixels(bigfont_width, bigfont_height, bigfont_pixels);
@@ -84,7 +85,7 @@ void menu_clear(void * v_scene){
     g_destroy_surface(entries[i].surface);
     if(i != current)free(entries[i].text);
   }
-  current = 0;
+  //current = 0;
   g_destroy_scrolltext(progvalue);
   g_destroy_surface(b);
 }

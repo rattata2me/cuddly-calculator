@@ -427,6 +427,7 @@ void graph_clear(void * v_scene){
 	py = 0;
 	sx = 0.25f;
 	sy = 0.25f;
+	MI_X = 0.0f;
 
 
 }
